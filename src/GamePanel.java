@@ -60,18 +60,22 @@ public class GamePanel extends JPanel {
         // Vẽ paddle
         Paddle paddle = game.getPaddle();
         g.setColor(Color.GREEN);
-        g.fillRect((int)paddle.getX(), (int)paddle.getY(), (int)paddle.getWidth(), (int)paddle.getHeight());
+        g.fillRect((int) paddle.getX(), (int) paddle.getY(), (int) paddle.getWidth(), (int) paddle.getHeight());
+
+        //debug paddle
+        System.out.println("Paddle: x=" + paddle.getX() + " y=" + paddle.getY() +
+                " w=" + paddle.getWidth() + " h=" + paddle.getHeight());
 
         // Vẽ bóng
         Ball ball = game.getBall();
         g.setColor(Color.WHITE);
-        g.fillOval((int)ball.getX(), (int)ball.getY(), (int)(ball.getRadius()*2), (int)(ball.getRadius()*2));
+        g.fillOval((int) ball.getX(), (int) ball.getY(), (int) (ball.getRadius() * 2), (int) (ball.getRadius() * 2));
 
         // Vẽ gạch
         g.setColor(Color.RED);
         for (Brick brick : game.getBricks()) {
             if (!brick.isDestroyed()) {
-                g.fillRect((int)brick.getX(), (int)brick.getY(), brick.getWidth(), brick.getHeight());
+                g.fillRect((int) brick.getX(), (int) brick.getY(), brick.getWidth(), brick.getHeight());
             }
         }
 
@@ -81,7 +85,7 @@ public class GamePanel extends JPanel {
         if (game.isGameOver()) {
             g.setColor(Color.RED);
             g.setFont(new Font("Arial", Font.BOLD, 36));
-            g.drawString("GAME OVER", getWidth()/2 - 100, getHeight()/2);
+            g.drawString("GAME OVER", getWidth() / 2 - 100, getHeight() / 2);
         }
     }
 }

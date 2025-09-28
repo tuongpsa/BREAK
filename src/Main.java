@@ -1,19 +1,24 @@
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class Main {
     public static void main(String[] args) {
+        // Tạo JFrame
         JFrame frame = new JFrame("Brick Breaker Demo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(480, 720);
+        frame.setSize(480, 820); // khớp với tọa độ game
         frame.setResizable(false);
 
+        // Tạo GamePanel
         GamePanel panel = new GamePanel();
         frame.add(panel);
+
+        // Hiển thị JFrame
         frame.setVisible(true);
 
-        panel.startGameLoop(); // bắt đầu vòng lặp game
+        // Bắt panel nhận focus để nhận bàn phím
+        panel.requestFocusInWindow();
+
+        // Bắt đầu vòng lặp game
+        panel.startGameLoop();
     }
 }
