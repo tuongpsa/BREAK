@@ -5,12 +5,16 @@ import java.awt.event.KeyEvent;
 
 public class GamePanel extends JPanel {
 import javafx.animation.AnimationTimer; // tạo vòng lặp
+import javafx.animation.AnimationTimer; // cho phép chạy một hàm handle(long now) mỗi frame
 import javafx.scene.canvas.Canvas; // một node để vẽ 2D
 import javafx.scene.canvas.GraphicsContext; // như bút vẽ lên canvas
 import javafx.scene.input.KeyCode; // cung cấp các phím
 import javafx.scene.image.Image;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
+
+// GamePanel kế thừa Canvas -> Node của scene graph
+public class GamePanel extends Canvas {
     private Game game;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
@@ -84,17 +88,38 @@ import javafx.scene.input.KeyEvent;
         );
     }
 
+    /**
+     * Use AnimationTimer để gọi liên tục.
+     * Use timeDistance cho chuyển động frame.
+     * update lại logic và render.
+     */
     public void startGameLoop() {
-        Timer timer = new Timer(16, e -> { // khoảng 60 FPS
-            updateGame();
-            repaint();
-        });
-        timer.start();
-    }
+        AnimationTimer timer = new AnimationTimer() {
+            private long lastTime = 0; // thời gian cập nhật trước
 
     private void updateGame() {
         float deltaTime = 0.016f;
+            @Override
+            public void handle(long now) {
+                if (lastTime > 0) {
+                    // khoảng thời gian trôi qua giữa 2 frame
+                    float timeDistance = (now - lastTime) / 1_000_000_000f;
+                    updateGame(timeDistance); // update logic
+                    render();
+                }
+                lastTime = now;
+            }
+        };
+        timer.start(); // bắt đầu vòng lặp
+    }
 
+    /**
+     * update logic game trong mỗi frame dc tạo.
+     * xử lý di chuyển paddle dựa vào phím.
+     * @param timeDistance khoảng tg giữa 2 frame.
+     */
+    private void updateGame(float timeDistance) {
+        background.updateBackground();
         if (!game.isGameOver()) {
             // Di chuyển paddle
             if (leftPressed) game.getPaddle().moveLeft(deltaTime);
@@ -102,6 +127,9 @@ import javafx.scene.input.KeyEvent;
 
             // Cập nhật bóng và va chạm
             game.update(deltaTime);
+            if (leftPressed) game.getPaddle().moveLeft(timeDistance); // gọi method move
+            if (rightPressed) game.getPaddle().moveRight(timeDistance);
+            game.update(timeDistance);
         }
     }
 
