@@ -7,6 +7,8 @@ import javafx.scene.canvas.GraphicsContext;
 
 /**
  *
+ * effects cho "GAME OVER".
+ * show score.
  */
 public class GameOverRenderer {
     public void render(GraphicsContext gc, double width, double height, int score) {
