@@ -4,11 +4,35 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class GamePanel extends JPanel {
+import javafx.animation.AnimationTimer; // tạo vòng lặp
+import javafx.scene.canvas.Canvas; // một node để vẽ 2D
+import javafx.scene.canvas.GraphicsContext; // như bút vẽ lên canvas
+import javafx.scene.input.KeyCode; // cung cấp các phím
+import javafx.scene.image.Image;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
     private Game game;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
 
     public GamePanel() {
+    private boolean leftPressed = false; // Biến quản lí nút trái
+    private boolean rightPressed = false; // Biến quản lí nút phải
+
+    private Image ballImage;
+    private Image paddleImage;
+    private Image brickImage;
+
+    private Background background;
+    private GameOverRenderer gameOverRenderer;
+
+    /**
+     * Constructor có tham số.
+     * @param width chiều dài
+     * @param height chiều rộng
+     */
+    public GamePanel(double width, double height) {
+        super(width, height); // gọi constructor của Canvas
         game = new Game();
 
         setFocusable(true);
@@ -18,6 +42,11 @@ public class GamePanel extends JPanel {
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = true;
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = true;
             }
+        // Load ảnh cho object game
+        ballImage = new Image("file:assets/ball.panda.png");// ảnh ball
+        paddleImage = new Image("file:assets/sword.png"); // ảnh paddle
+        brickImage = new Image("file:assets/thanh2.png"); // ảnh brick
+        background = new Background("assets/sky.png", "assets/mountain.png", "assets/cloud1.png", 0.3, 0.6);
 
             @Override
             public void keyReleased(KeyEvent e) {
@@ -25,6 +54,34 @@ public class GamePanel extends JPanel {
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = false;
             }
         });
+        //Check lỗi load ảnh
+        if (ballImage.isError() || paddleImage.isError() || brickImage.isError()) {
+            System.out.println("Object game is error");
+        }
+
+        this.setFocusTraversable(true); // Canvas nhận lệnh từ keyboard
+        this.setOnKeyPressed( // ghi nhận sự kiện khi nhấn phím
+                new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent e) {
+                        if (e.getCode() == KeyCode.LEFT) leftPressed = true;
+                        if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
+                    }
+                }
+        );
+        this.setOnKeyReleased( // ghi nhận sự kiện nhả phím
+                new EventHandler<KeyEvent>() {
+                    @Override
+                    public void handle(KeyEvent e) {
+                        if (e.getCode() == KeyCode.LEFT) {
+                            leftPressed = false;
+                        }
+                        if (e.getCode() == KeyCode.RIGHT) {
+                            rightPressed = false;
+                        }
+                    }
+                }
+        );
     }
 
     public void startGameLoop() {
