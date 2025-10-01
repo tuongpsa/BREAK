@@ -6,7 +6,6 @@ import javafx.scene.text.Font;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
- *
  * effects cho "GAME OVER".
  * show score.
  */
