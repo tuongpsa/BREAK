@@ -9,6 +9,8 @@ import javafx.animation.AnimationTimer; // cho phép chạy một hàm handle(lo
 import javafx.scene.canvas.Canvas; // một node để vẽ 2D
 import javafx.scene.canvas.GraphicsContext; // như bút vẽ lên canvas
 import javafx.scene.input.KeyCode; // cung cấp các phím
+import javafx.scene.paint.Color; // cung cấp màu vẽ
+import javafx.scene.text.Font; // setFont
 import javafx.scene.image.Image;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
@@ -133,6 +135,13 @@ public class GamePanel extends Canvas {
         }
     }
 
+    /**
+     * Vẽ paddel, ball, brick, hiện score điểm.
+     * Vẽ text khi gameover : score, gameover.
+     */
+    private void render() {
+        GraphicsContext gc = getGraphicsContext2D();
+        background.drawBackground(gc, getWidth(), getHeight());
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -150,27 +159,52 @@ public class GamePanel extends Canvas {
         //debug paddle
         System.out.println("Paddle: x=" + paddle.getX() + " y=" + paddle.getY() +
                 " w=" + paddle.getWidth() + " h=" + paddle.getHeight());
+        // tọa độ tâm paddle
+        double paddleCenterX = paddle.getX() + paddle.getWidth() / 2;
+        double paddleCenterY = paddle.getY() + paddle.getHeight() / 2;
+        // vẽ paddle
+        gc.drawImage(
+                paddleImage,
+                paddleCenterX - paddle.getWidth() / 2,   // tọa độ x
+                paddleCenterY - paddle.getHeight() / 2,  // tọa độ y
+                paddle.getWidth(),                 // width
+                paddle.getHeight()*5.5             // height
+        );
+        // Debug paddle
+        System.out.println("Paddle: x=" + paddle.getX());
 
         // Vẽ bóng
         Ball ball = game.getBall();
         g.setColor(Color.WHITE);
         g.fillOval((int) ball.getX(), (int) ball.getY(), (int) (ball.getRadius() * 2), (int) (ball.getRadius() * 2));
+        gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius() * 2, ball.getRadius() * 2);
 
         // Vẽ gạch
         g.setColor(Color.RED);
         for (Brick brick : game.getBricks()) {
             if (!brick.isDestroyed()) {
                 g.fillRect((int) brick.getX(), (int) brick.getY(), brick.getWidth(), brick.getHeight());
+                gc.drawImage(brickImage, brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight());
             }
         }
 
         // Hiển thị score
         g.setColor(Color.YELLOW);
         g.drawString("Score: " + game.getScore(), 10, 20);
+        // Vẽ điểm
+        gc.setFill(Color.BLACK);
+        gc.setFont(Font.font(18));
+        gc.fillText("Score: " + game.getScore(), 10, 20);
+
+        // Khi gameover
         if (game.isGameOver()) {
             g.setColor(Color.RED);
             g.setFont(new Font("Arial", Font.BOLD, 36));
             g.drawString("GAME OVER", getWidth() / 2 - 100, getHeight() / 2);
+
+            gameOverRenderer = new GameOverRenderer();
+            gameOverRenderer  .render(gc, getWidth(), getHeight(), game.getScore());
         }
     }
 }
+
