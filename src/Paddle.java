@@ -11,13 +11,20 @@ public class Paddle {
     }
 
     // paddle di chuyển trái phải
-    public void moveLeft(float deltaTime) {
+    public void moveLeft(float deltaTime, float screenWidth) {
         x -= speed * deltaTime;
+        if (x < 0) {
+            x = 0; // không cho vượt ra ngoài bên trái
+        }
     }
 
-    public void moveRight(float deltaTime) {
+    public void moveRight(float deltaTime, float screenWidth) {
         x += speed * deltaTime;
+        if (x + width > screenWidth) {
+            x = screenWidth - width; // không cho vượt ra ngoài bên phải
+        }
     }
+
 
     // getter,setter
     public float getX() {

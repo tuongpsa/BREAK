@@ -12,7 +12,7 @@ public class Game {
 
     private Paddle paddle;
     private final float paddleWidth = width / 2;
-    private final float paddleHeight = 15;
+    private final float paddleHeight = 10;
 
     private List<Brick> bricks = new ArrayList<>();
     private final int maxBrick = 5;
@@ -49,11 +49,15 @@ public class Game {
         }
     }
 
-    public void update(float deltaTime){
-        if(gameOver) return; // dừng update nếu game over
+    public void update(float deltaTime) {
+        if (gameOver) return; // dừng update nếu game over
+
         ball.move(deltaTime);
-        CollisionHandler.checkCollisions(this); // gọi method đã truyền Game
+
+        CollisionHandler handler = new CollisionHandler();
+        handler.handleBallBrickCollision(ball, deltaTime, bricks,this,paddle);
     }
+
 
     // Getters
     public Ball getBall(){ return ball; }
