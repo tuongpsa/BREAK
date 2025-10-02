@@ -98,8 +98,8 @@ public class GamePanel extends Canvas {
     private void updateGame(float timeDistance) {
         background.updateBackground();
         if (!game.isGameOver()) {
-            if (leftPressed) game.getPaddle().moveLeft(timeDistance); // gọi method move
-            if (rightPressed) game.getPaddle().moveRight(timeDistance);
+            if (leftPressed) game.getPaddle().moveLeft(timeDistance, game.getWidth()); // gọi method move
+            if (rightPressed) game.getPaddle().moveRight(timeDistance, game.getWidth());
             game.update(timeDistance);
         }
     }
