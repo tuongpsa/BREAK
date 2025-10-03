@@ -1,0 +1,60 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Compile Java",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "-cp",
+                "src",
+                "-d",
+                "out/production/BREAK",
+                "src/*.java"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run with JavaFX",
+            "type": "shell",
+            "command": "java",
+            "args": [
+                "--module-path",
+                "D:\\javafx-sdk-25\\lib",
+                "--add-modules",
+                "javafx.controls,javafx.fxml",
+                "-cp",
+                "out/production/BREAK",
+                "Main"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "dependsOn": "Compile Java",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build and Run",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Compile Java",
+                "Run with JavaFX"
+            ],
+            "group": "build"
+        }
+    ]
+}
