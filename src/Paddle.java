@@ -1,7 +1,7 @@
 public class Paddle {
     private float x, y; //vị trí ban đầu
     private float width, height; //chiều dài,chiều cao ban đầu
-    private float speed = 200.f; // tốc độ thanh đỡ ban đầu
+    private float speed = 400.f; // tốc độ thanh đỡ ban đầu
 
     public Paddle(float startX, float startY, float width, float height) {
         this.x = startX;

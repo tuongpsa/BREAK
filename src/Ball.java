@@ -8,7 +8,7 @@ public class Ball {
         this.y = y;
         this.radius = radius;
         this.velX = speed;
-        this.velY = -speed;
+        this.velY = speed;
     }
 
     public void move(float deltaTime) {

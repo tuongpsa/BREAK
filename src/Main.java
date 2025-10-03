@@ -10,6 +10,7 @@ public class Main extends Application {
     private MenuPanel menuPanel;
     private Scene gameScene;
     private Scene menuScene;
+    private AnimationTimer gameOverTimer;
     
     @Override // ghi đè lên phg thức start của lớp Application
     public void start(Stage stage) {
@@ -55,6 +56,16 @@ public class Main extends Application {
     }
     
     private void switchToGame() {
+        // Reset game nếu gamePanel đã tồn tại
+        if (gamePanel != null) {
+            gamePanel.getGame().resetGame();
+        } else {
+            // Tạo gamePanel mới chỉ lần đầu
+            gamePanel = new GamePanel(480, 820);
+            StackPane gameRoot = new StackPane(gamePanel);
+            gameScene = new Scene(gameRoot, 480, 820);
+        }
+        
         primaryStage.setScene(gameScene);
         gamePanel.setMenuCallback(() -> switchToMenu());
         gamePanel.startGameLoop();
@@ -65,7 +76,12 @@ public class Main extends Application {
     }
     
     private void startGameOverLoop() {
-        AnimationTimer gameOverTimer = new AnimationTimer() {
+        // Dừng timer cũ nếu có
+        if (gameOverTimer != null) {
+            gameOverTimer.stop();
+        }
+        
+        gameOverTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (gamePanel.getGame().isGameOver()) {
@@ -77,6 +93,11 @@ public class Main extends Application {
     }
     
     private void switchToMenu() {
+        // Dừng game loop cũ nếu có
+        if (gamePanel != null) {
+            gamePanel.stopGameLoop();
+        }
+        
         primaryStage.setScene(menuScene);
         menuPanel.resetStartGame();
         menuPanel.resetQuitGame();

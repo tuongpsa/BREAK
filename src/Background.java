@@ -71,8 +71,6 @@ public class Background {
             gc.drawImage(cloud, cloudX + cloud.getWidth(), cloudYs[i]);// tạo sự liền mạch khi cloud1
             // di chuyển hết màn hình.
 
-            //Check tạo độ
-            System.out.println("CloudX=" + cloudX );
         }
 
         //Tương tự cloud
@@ -80,7 +78,5 @@ public class Background {
         gc.drawImage(mountain, mountainX, mountainY);
         gc.drawImage(mountain, mountainX + mountain.getWidth(), mountainY);
 
-        //Check tạo độ
-        System.out.println("MountainX=" + mountainX + " MountainY=" + mountainY);
     }
 }

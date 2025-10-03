@@ -11,7 +11,7 @@ public class CollisionHandler {
         float screenHeight = game.getHeight();
 
 
-        float stepSize = radius / 4.0f;
+        float stepSize = radius / 2.0f;
         int steps = (int) Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / stepSize);
         if (steps < 1) steps = 1;
 
@@ -49,7 +49,7 @@ public class CollisionHandler {
 
 
         // Dưới → GAME OVER
-        if (ball.getY() + radius * 2 >= screenHeight + 25 ) {
+        if (ball.getY() >= screenHeight) {
             game.setGameOver(true);
         }
 

@@ -8,7 +8,7 @@ public class Game {
 
     private Ball ball;
     private final float ballRadius = 10;
-    private final float ballSpeed = 80.f;
+    private final float ballSpeed = 200.f;
 
     private Paddle paddle;
     private final float paddleWidth = width / 2;
@@ -23,7 +23,7 @@ public class Game {
     private Random rand = new Random();
 
     public Game() {
-        ball = new Ball((width/2)-ballRadius, height-20.01f-(2*ballRadius), ballRadius, ballSpeed);
+        ball = new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed);
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks();
     }
@@ -76,7 +76,7 @@ public class Game {
     public void resetGame() {
         gameOver = false;
         score = 0;
-        ball = new Ball((width/2)-ballRadius, height-20.01f-(2*ballRadius), ballRadius, ballSpeed);
+        ball = new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed);
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks();
     }

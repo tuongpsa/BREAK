@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 public class GamePanel extends Canvas {
     private Game game;
     private MenuCallback menuCallback;
+    private AnimationTimer gameTimer;
 
     private boolean leftPressed = false; // Biến quản lí nút trái
     private boolean rightPressed = false; // Biến quản lí nút phải
@@ -87,7 +88,12 @@ public class GamePanel extends Canvas {
      * update lại logic và render.
      */
     public void startGameLoop() {
-        AnimationTimer timer = new AnimationTimer() {
+        // Dừng timer cũ nếu có
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
+        
+        gameTimer = new AnimationTimer() {
             private long lastTime = 0; // thời gian cập nhật trước
 
             @Override
@@ -101,7 +107,13 @@ public class GamePanel extends Canvas {
                 lastTime = now;
             }
         };
-        timer.start(); // bắt đầu vòng lặp
+        gameTimer.start(); // bắt đầu vòng lặp
+    }
+    
+    public void stopGameLoop() {
+        if (gameTimer != null) {
+            gameTimer.stop();
+        }
     }
 
     /**
@@ -138,12 +150,11 @@ public class GamePanel extends Canvas {
                 paddle.getWidth(),                 // width
                 paddle.getHeight()*5.5             // height
         );
-        // Debug paddle
-        System.out.println("Paddle: x=" + paddle.getX());
 
         // Vẽ bóng
         Ball ball = game.getBall();
         gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius() * 2, ball.getRadius() * 2);
+        
 
         // Vẽ gạch
         for (Brick brick : game.getBricks()) {
