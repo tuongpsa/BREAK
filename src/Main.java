@@ -56,6 +56,11 @@ public class Main extends Application {
     }
     
     private void switchToGame() {
+        // Dừng nhạc menu
+        if (menuPanel != null) {
+            menuPanel.stopMenuMusic();
+        }
+        
         // Reset game nếu gamePanel đã tồn tại
         if (gamePanel != null) {
             gamePanel.getGame().resetGame();
@@ -102,6 +107,13 @@ public class Main extends Application {
         menuPanel.resetStartGame();
         menuPanel.resetQuitGame();
         menuPanel.requestFocus();
+        
+        // Bắt đầu lại nhạc menu
+        if (menuPanel != null) {
+            menuPanel.stopMenuMusic(); // Dừng nhạc cũ trước
+            // Nhạc menu sẽ tự động bắt đầu lại trong MenuPanel constructor
+        }
+        
         startMenuLoop();
     }
 

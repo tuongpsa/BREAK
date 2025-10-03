@@ -1,30 +1,24 @@
 @echo off
-echo ========================================
-echo    BRICK BREAKER GAME - JavaFX
-echo ========================================
+title Brick Breaker Game
+color 0A
+
+echo.
+echo    ==========================================
+echo    |        BRICK BREAKER GAME             |
+echo    |     Click to Start Playing!           |
+echo    ==========================================
 echo.
 
-echo [1/3] Compiling Java files...
+echo Compiling game...
 javac --module-path "D:\javafx-sdk-25\lib" --add-modules javafx.controls,javafx.fxml,javafx.media -cp "src" -d "out/production/BREAK" src/*.java
+
 if %errorlevel% neq 0 (
     echo ERROR: Compilation failed!
     pause
     exit /b 1
 )
-echo ✓ Compilation successful!
 
-echo.
-echo [2/3] Checking JavaFX SDK...
-if not exist "D:\javafx-sdk-25\lib" (
-    echo ERROR: JavaFX SDK not found at D:\javafx-sdk-25\lib
-    echo Please check if JavaFX SDK is installed correctly
-    pause
-    exit /b 1
-)
-echo ✓ JavaFX SDK found!
-
-echo.
-echo [3/3] Starting game...
+echo Starting game...
 java --module-path "D:\javafx-sdk-25\lib" --add-modules javafx.controls,javafx.fxml,javafx.media --enable-native-access=javafx.graphics,javafx.media --add-exports javafx.base/com.sun.javafx=ALL-UNNAMED -cp "out/production/BREAK" Main
 
 echo.

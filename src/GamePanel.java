@@ -23,6 +23,7 @@ public class GamePanel extends Canvas {
 
     private Background background;
     private GameOverRenderer gameOverRenderer;
+    private AudioManager audioManager;
 
     /**
      * Constructor có tham số.
@@ -31,7 +32,8 @@ public class GamePanel extends Canvas {
      */
     public GamePanel(double width, double height) {
         super(width, height); // gọi constructor của Canvas
-        game = new Game();
+        audioManager = new AudioManager();
+        game = new Game(audioManager);
 
         // Load ảnh cho object game
         ballImage = new Image("file:assets/ball.panda.png");// ảnh ball
@@ -108,11 +110,21 @@ public class GamePanel extends Canvas {
             }
         };
         gameTimer.start(); // bắt đầu vòng lặp
+        
+        // Bắt đầu nhạc game
+        if (audioManager != null) {
+            audioManager.playGameMusic();
+        }
     }
     
     public void stopGameLoop() {
         if (gameTimer != null) {
             gameTimer.stop();
+        }
+        
+        // Dừng nhạc game
+        if (audioManager != null) {
+            audioManager.stopGameMusic();
         }
     }
 
@@ -170,7 +182,11 @@ public class GamePanel extends Canvas {
 
         // Khi gameover
         if (game.isGameOver()) {
-
+            // Phát âm thanh game over
+            if (audioManager != null) {
+                audioManager.playGameOver();
+            }
+            
             gameOverRenderer = new GameOverRenderer();
             gameOverRenderer  .render(gc, getWidth(), getHeight(), game.getScore());
         }

@@ -9,12 +9,14 @@ import javafx.event.EventHandler;
  */
 public class MenuPanel extends Canvas {
     private MenuRenderer menuRenderer;
+    private AudioManager audioManager;
     private boolean startGame = false;
     private boolean quitGame = false;
     
     public MenuPanel(double width, double height) {
         super(width, height);
         menuRenderer = new MenuRenderer();
+        audioManager = new AudioManager();
         
         // Thiết lập để nhận sự kiện chuột
         this.setFocusTraversable(true);
@@ -47,6 +49,11 @@ public class MenuPanel extends Canvas {
         
         // Bắt đầu vòng lặp render menu
         startMenuLoop();
+        
+        // Bắt đầu nhạc menu
+        if (audioManager != null) {
+            audioManager.playMenuMusic();
+        }
     }
     
     private boolean isPointInStartButton(double x, double y) {
@@ -99,5 +106,11 @@ public class MenuPanel extends Canvas {
     
     public void resetQuitGame() {
         quitGame = false;
+    }
+    
+    public void stopMenuMusic() {
+        if (audioManager != null) {
+            audioManager.stopMenuMusic();
+        }
     }
 }

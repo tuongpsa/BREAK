@@ -2,6 +2,12 @@ import java.awt.Rectangle;
 import java.util.List;
 
 public class CollisionHandler {
+    private AudioManager audioManager;
+    
+    public CollisionHandler(AudioManager audioManager) {
+        this.audioManager = audioManager;
+    }
+    
     public  void handleBallBrickCollision(Ball ball, float deltaTime, List<Brick> bricks,Game game ,Paddle paddle) {
         float dx = ball.getVelX() * deltaTime;
         float dy = ball.getVelY() * deltaTime;
@@ -44,6 +50,10 @@ public class CollisionHandler {
 
             if (ball.getVelY() > 0) {  // chỉ nảy nếu bóng đang đi xuống
                 ball.reverseY();
+                // Phát âm thanh khi chạm paddle
+                if (audioManager != null) {
+                    audioManager.playPaddleHit();
+                }
             }
         }
 
@@ -67,6 +77,11 @@ public class CollisionHandler {
 
                     if (hitX && hitY) {
                         brick.hit();
+                        
+                        // Phát âm thanh khi chạm gạch
+                        if (audioManager != null) {
+                            audioManager.playBrickHit();
+                        }
 
                         float overlapLeft   = Math.abs((nextX + radius * 2) - rect.x);
                         float overlapRight  = Math.abs((rect.x + rect.width) - nextX);

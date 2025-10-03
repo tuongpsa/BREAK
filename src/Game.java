@@ -21,8 +21,10 @@ public class Game {
     private boolean gameOver = false;
 
     private Random rand = new Random();
+    private AudioManager audioManager;
 
-    public Game() {
+    public Game(AudioManager audioManager) {
+        this.audioManager = audioManager;
         ball = new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed);
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks();
@@ -54,7 +56,7 @@ public class Game {
 
         ball.move(deltaTime);
 
-        CollisionHandler handler = new CollisionHandler();
+        CollisionHandler handler = new CollisionHandler(audioManager);
         handler.handleBallBrickCollision(ball, deltaTime, bricks,this,paddle);
     }
 
@@ -79,6 +81,11 @@ public class Game {
         ball = new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed);
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks();
+    }
+    
+    // Constructor mặc định cho tương thích ngược
+    public Game() {
+        this(null);
     }
     
     // Getter cho ballSpeed
