@@ -11,6 +11,7 @@ import javafx.scene.input.KeyEvent;
 // GamePanel kế thừa Canvas -> Node của scene graph
 public class GamePanel extends Canvas {
     private Game game;
+    private MenuCallback menuCallback;
 
     private boolean leftPressed = false; // Biến quản lí nút trái
     private boolean rightPressed = false; // Biến quản lí nút phải
@@ -49,6 +50,19 @@ public class GamePanel extends Canvas {
                     public void handle(KeyEvent e) {
                         if (e.getCode() == KeyCode.LEFT) leftPressed = true;
                         if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
+                        
+                        // Xử lý phím khi game over
+                        if (game.isGameOver()) {
+                            if (e.getCode() == KeyCode.R) {
+                                // Restart game
+                                game.resetGame();
+                            } else if (e.getCode() == KeyCode.ESCAPE) {
+                                // Quay về menu
+                                if (menuCallback != null) {
+                                    menuCallback.returnToMenu();
+                                }
+                            }
+                        }
                     }
                 }
         );
@@ -149,6 +163,16 @@ public class GamePanel extends Canvas {
             gameOverRenderer = new GameOverRenderer();
             gameOverRenderer  .render(gc, getWidth(), getHeight(), game.getScore());
         }
+    }
+    
+    // Thêm method để truy cập game object
+    public Game getGame() {
+        return game;
+    }
+    
+    // Set callback để quay về menu
+    public void setMenuCallback(MenuCallback callback) {
+        this.menuCallback = callback;
     }
 }
 

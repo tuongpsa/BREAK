@@ -8,7 +8,7 @@ public class Game {
 
     private Ball ball;
     private final float ballRadius = 10;
-    private final float ballSpeed = 400.f;
+    private final float ballSpeed = 80.f;
 
     private Paddle paddle;
     private final float paddleWidth = width / 2;
@@ -71,4 +71,16 @@ public class Game {
     // Game over
     public boolean isGameOver(){ return gameOver; }
     public void setGameOver(boolean b){ gameOver = b; }
+    
+    // Thêm method để reset game
+    public void resetGame() {
+        gameOver = false;
+        score = 0;
+        ball = new Ball((width/2)-ballRadius, height-20.01f-(2*ballRadius), ballRadius, ballSpeed);
+        paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
+        createBricks();
+    }
+    
+    // Getter cho ballSpeed
+    public float getBallSpeed() { return ballSpeed; }
 }
