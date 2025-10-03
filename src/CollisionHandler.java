@@ -62,7 +62,6 @@ public class CollisionHandler {
             for (Brick brick : bricks) {
                 if (!brick.isDestroyed()) {
                     Rectangle rect = brick.getBounds();
-
                     boolean hitX = nextX + radius * 2 > rect.x && nextX < rect.x + rect.width;
                     boolean hitY = nextY + radius * 2 > rect.y && nextY < rect.y + rect.height;
 
@@ -82,6 +81,7 @@ public class CollisionHandler {
                         } else {
                             ball.setVelX(-ball.getVelX());
                         }
+                        if(brick.isDestroyed()==true) game.addScore(10);
 
                         collided = true;
                         break; // thoát vòng lặp bricks

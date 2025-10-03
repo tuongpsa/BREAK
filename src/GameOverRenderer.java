@@ -13,7 +13,7 @@ public class GameOverRenderer {
     public void render(GraphicsContext gc, double width, double height, int score) {
 
         //Set font chữ cho gameover
-        String text = "GAME OVER";
+        String text = "GAME OVER";;
         Font overFont = Font.loadFont("file:assets/upheavtt.ttf", 64);
         gc.setFont(overFont);
         gc.setFill(Color.color(0, 0, 0, 0.6)); // red = 0, green = 0, blue = 0, trong suốt = 0.6 / 1.0
