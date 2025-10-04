@@ -3,80 +3,46 @@ import javafx.scene.image.Image;
 
 public class Background {
 
-    // Khai báo các field
-    private Image sky;
-    private Image mountain;
-    private Image cloud;
-
-    // Tọa độ X mặc định của mountain và cloud
-    private double mountainX = 0;
-    private double cloudX = 0;
-    private double[] cloudYs = new double[2]; // mảng 2 đám mây lưu tạo độ dọc
-
-    // Scroll speed của mountain và cloud
-    private double mountainSpeed = 0.3;// mo frame di chuyển 0.3 px
-    private double cloudSpeed = 0.6;
+    // Chỉ sử dụng 1 ảnh background
+    private Image background;
 
     /**
-     * Taoj constructor có tham số.
-     * @param skyLink link dan den sky.
-     * @param mountainLink link dan mountain.
-     * @param cloudLink link dan cloud.
-     * @param mountainSpeed mountain scroll speed.
-     * @param cloudSpeed clound scroll speed.
+     * Constructor đơn giản chỉ cần 1 ảnh background.
+     * @param backgroundLink link đến ảnh background chính.
      */
-    public Background(String skyLink, String mountainLink, String cloudLink, double mountainSpeed, double cloudSpeed) {
-        // Load anh từ link truyền vào
-        this.sky = new Image("file:" + skyLink);
-        this.mountain = new Image("file:" + mountainLink);
-        this.cloud = new Image("file:" + cloudLink);
+    public Background(String backgroundLink) {
+        // Load ảnh background
+        this.background = new Image("file:" + backgroundLink);
 
-        // Check xem co load dc anh hk
-        if (sky.isError() || mountain.isError() || cloud.isError()) {
-            System.out.println("Background image load error");
+        // Check xem có load được ảnh không
+        if (background.isError()) {
+            System.out.println("Background image load error: " + backgroundLink);
+        } else {
+            System.out.println("Background image loaded successfully: " + backgroundLink);
         }
-
-        // Gán tham số truyền vao cho this
-        this.mountainSpeed = mountainSpeed;
-        this.cloudSpeed = cloudSpeed;
     }
 
     /**
-     * update vị trí cuộn.
-     * Khi mà vị trí trái của núi và mây cuộn ra ngoài màn hình
-     * thì reset lại objectX = 0.
+     * Không cần update vì chỉ có 1 ảnh background tĩnh.
      */
     public void updateBackground() {
-        mountainX -= mountainSpeed; // cuộn núi
-        cloudX -= cloudSpeed;
-
-        if (mountainX < -mountain.getWidth()) mountainX = 0;
-        if (cloudX < -cloud.getWidth()) cloudX = 0;
+        // Không cần làm gì vì background tĩnh
     }
 
     /**
-     * Vẽ sky hk di chuyển.
-     * vẽ 2 cloud liền mạch vs nhau.
-     * @param gc đối tượng trong method graphicsContext.
-     * @param width Chiều rộng.
-     * @param height chiều dài.
+     * Vẽ background đơn giản.
+     * @param gc đối tượng GraphicsContext.
+     * @param width Chiều rộng màn hình.
+     * @param height Chiều cao màn hình.
      */
     public void drawBackground(GraphicsContext gc, double width, double height) {
-
-        gc.drawImage(sky, 0, 0, width, height);
-
-        //Chạy for để vẽ clouds
-        for (int i = 0; i < cloudYs.length; i++) {
-            gc.drawImage(cloud, cloudX, cloudYs[i]);
-            gc.drawImage(cloud, cloudX + cloud.getWidth(), cloudYs[i]);// tạo sự liền mạch khi cloud1
-            // di chuyển hết màn hình.
-
+        // Chỉ vẽ 1 ảnh background
+        if (background != null && !background.isError()) {
+            gc.drawImage(background, 0, 0, width, height);
+        } else {
+            // Fallback: vẽ background màu đen nếu không load được ảnh
+            gc.setFill(javafx.scene.paint.Color.BLACK);
+            gc.fillRect(0, 0, width, height);
         }
-
-        //Tương tự cloud
-        double mountainY = height - mountain.getHeight();
-        gc.drawImage(mountain, mountainX, mountainY);
-        gc.drawImage(mountain, mountainX + mountain.getWidth(), mountainY);
-
     }
 }

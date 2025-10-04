@@ -39,7 +39,7 @@ public class GamePanel extends Canvas {
         ballImage = new Image("file:assets/ball.panda.png");// ảnh ball
         paddleImage = new Image("file:assets/sword.png"); // ảnh paddle
         brickImage = new Image("file:assets/thanh2.png"); // ảnh brick
-        background = new Background("assets/sky.png", "assets/mountain.png", "assets/cloud1.png", 0.3, 0.6);
+        background = new Background("file:assets/background.jpg");
 
         //Check lỗi load ảnh
         if (ballImage.isError() || paddleImage.isError() || brickImage.isError()) {
