@@ -105,8 +105,8 @@ public class CollisionHandler {
             }
 
             // luôn cập nhật vị trí bóng
-           // ball.setX(nextX);
-           // ball.setY(nextY);
+            ball.setX(nextX);
+            ball.setY(nextY);
 
             if (collided) break; // sau khi va chạm thì thoát bước này
         }

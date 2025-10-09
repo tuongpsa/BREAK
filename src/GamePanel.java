@@ -7,6 +7,7 @@ import javafx.scene.text.Font; // setFont
 import javafx.scene.image.Image;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
+import javafx.application.Platform;
 
 // GamePanel kế thừa Canvas -> Node của scene graph
 public class GamePanel extends Canvas {
@@ -24,6 +25,8 @@ public class GamePanel extends Canvas {
     private Background background;
     private GameOverRenderer gameOverRenderer;
     private AudioManager audioManager;
+    private HighScoreManager highScoreManager;
+    private boolean highScoreProcessed = false;
 
     /**
      * Constructor có tham số.
@@ -34,12 +37,13 @@ public class GamePanel extends Canvas {
         super(width, height); // gọi constructor của Canvas
         audioManager = new AudioManager();
         game = new Game(audioManager);
+        highScoreManager = new HighScoreManager();
 
         // Load ảnh cho object game
         ballImage = new Image("file:assets/ball.panda.png");// ảnh ball
         paddleImage = new Image("file:assets/sword.png"); // ảnh paddle
         brickImage = new Image("file:assets/thanh2.png"); // ảnh brick
-        background = new Background("file:assets/background.jpg");
+        background = new Background("assets/sky.png", "assets/mountain.png", "assets/cloud1.png", 0.3, 0.6);
 
         //Check lỗi load ảnh
         if (ballImage.isError() || paddleImage.isError() || brickImage.isError()) {
@@ -59,6 +63,7 @@ public class GamePanel extends Canvas {
                             if (e.getCode() == KeyCode.R) {
                                 // Restart game
                                 game.resetGame();
+                                highScoreProcessed = false; // Reset flag khi restart
                             } else if (e.getCode() == KeyCode.ESCAPE) {
                                 // Quay về menu
                                 if (menuCallback != null) {
@@ -187,8 +192,14 @@ public class GamePanel extends Canvas {
                 audioManager.playGameOver();
             }
             
+            // Xử lý high score chỉ một lần
+            if (!highScoreProcessed) {
+                processHighScore();
+                highScoreProcessed = true;
+            }
+            
             gameOverRenderer = new GameOverRenderer();
-            gameOverRenderer  .render(gc, getWidth(), getHeight(), game.getScore());
+            gameOverRenderer.render(gc, getWidth(), getHeight(), game.getScore());
         }
     }
     
@@ -200,6 +211,23 @@ public class GamePanel extends Canvas {
     // Set callback để quay về menu
     public void setMenuCallback(MenuCallback callback) {
         this.menuCallback = callback;
+    }
+    
+    // Xử lý high score khi game over
+    private void processHighScore() {
+        int currentScore = game.getScore();
+        
+        // Sử dụng Platform.runLater để đảm bảo dialog chạy trên JavaFX Application Thread
+        Platform.runLater(() -> {
+            if (highScoreManager.isHighScore(currentScore)) {
+                // Hiển thị dialog nhập tên
+                String playerName = NameInputDialog.showDialog(currentScore);
+                highScoreManager.addScore(playerName, currentScore);
+            } else {
+                // Hiển thị thông báo không phải high score
+                NameInputDialog.showNotHighScoreDialog(currentScore);
+            }
+        });
     }
 }
 
