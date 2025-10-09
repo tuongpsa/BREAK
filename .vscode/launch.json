@@ -3,13 +3,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Main",
-            "request": "launch",
-            "mainClass": "Main",
-            "projectName": "BREAK_e7f57e06"
-        },
-        {
-            "type": "java",
             "name": "Main (JavaFX)",
             "request": "launch",
             "mainClass": "Main",

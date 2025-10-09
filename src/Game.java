@@ -8,10 +8,10 @@ public class Game {
 
     private Ball ball;
     private final float ballRadius = 10;
-    private final float ballSpeed = 200.f;
+    private final float ballSpeed = 800.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width / 2;
+    private final float paddleWidth = width ;
     private final float paddleHeight = 10;
 
     private List<Brick> bricks = new ArrayList<>();
