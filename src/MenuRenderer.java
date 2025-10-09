@@ -49,23 +49,26 @@ public class MenuRenderer {
         gc.fillText(title, width / 2, height / 2 - 100);
         
         // Vẽ nút Start
-        drawButton(gc, width, height, "START GAME", height / 2 - 20, 200, 50);
+        drawButton(gc, width, height, "START GAME", height / 2 - 40, 200, 50);
+        
+        // Vẽ nút High Score
+        drawButton(gc, width, height, "HIGH SCORE", height / 2 + 20, 200, 50);
         
         // Vẽ nút Quit
-        drawButton(gc, width, height, "QUIT", height / 2 + 50, 150, 40);
+        drawButton(gc, width, height, "QUIT", height / 2 + 80, 150, 40);
         
         // Vẽ hướng dẫn
         String instruction = "Click START GAME to begin";
         Font instructionFont = Font.loadFont("file:assets/VSWISEC.ttf", 16);
         gc.setFont(instructionFont);
         gc.setFill(Color.LIGHTGRAY);
-        gc.fillText(instruction, width / 2, height / 2 + 120);
+        gc.fillText(instruction, width / 2, height / 2 + 140);
         
         // Vẽ thông tin game
         String info = "Use LEFT/RIGHT arrow keys to move paddle";
         gc.setFont(Font.font(14));
         gc.setFill(Color.GRAY);
-        gc.fillText(info, width / 2, height / 2 + 150);
+        gc.fillText(info, width / 2, height / 2 + 170);
     }
     
     private void drawButton(GraphicsContext gc, double width, double height, String text, double y, double buttonWidth, double buttonHeight) {

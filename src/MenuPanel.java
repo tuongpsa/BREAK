@@ -12,6 +12,7 @@ public class MenuPanel extends Canvas {
     private AudioManager audioManager;
     private boolean startGame = false;
     private boolean quitGame = false;
+    private boolean showHighScore = false;
     
     public MenuPanel(double width, double height) {
         super(width, height);
@@ -31,6 +32,10 @@ public class MenuPanel extends Canvas {
                 // Kiểm tra click vào nút Start Game
                 if (isPointInStartButton(mouseX, mouseY)) {
                     startGame = true;
+                }
+                // Kiểm tra click vào nút High Score
+                else if (isPointInHighScoreButton(mouseX, mouseY)) {
+                    showHighScore = true;
                 }
                 // Kiểm tra click vào nút Quit
                 else if (isPointInQuitButton(mouseX, mouseY)) {
@@ -60,7 +65,17 @@ public class MenuPanel extends Canvas {
         double buttonWidth = 200;
         double buttonHeight = 50;
         double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getHeight() / 2 - 20;
+        double buttonY = getHeight() / 2 - 40;
+        
+        return x >= buttonX && x <= buttonX + buttonWidth &&
+               y >= buttonY && y <= buttonY + buttonHeight;
+    }
+    
+    private boolean isPointInHighScoreButton(double x, double y) {
+        double buttonWidth = 200;
+        double buttonHeight = 50;
+        double buttonX = (getWidth() - buttonWidth) / 2;
+        double buttonY = getHeight() / 2 + 20;
         
         return x >= buttonX && x <= buttonX + buttonWidth &&
                y >= buttonY && y <= buttonY + buttonHeight;
@@ -70,7 +85,7 @@ public class MenuPanel extends Canvas {
         double buttonWidth = 150;
         double buttonHeight = 40;
         double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getHeight() / 2 + 50;
+        double buttonY = getHeight() / 2 + 80;
         
         return x >= buttonX && x <= buttonX + buttonWidth &&
                y >= buttonY && y <= buttonY + buttonHeight;
@@ -100,12 +115,20 @@ public class MenuPanel extends Canvas {
         return quitGame;
     }
     
+    public boolean isShowHighScore() {
+        return showHighScore;
+    }
+    
     public void resetStartGame() {
         startGame = false;
     }
     
     public void resetQuitGame() {
         quitGame = false;
+    }
+    
+    public void resetShowHighScore() {
+        showHighScore = false;
     }
     
     public void stopMenuMusic() {
