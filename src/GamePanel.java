@@ -12,6 +12,7 @@ import javafx.application.Platform;
 // GamePanel kế thừa Canvas -> Node của scene graph
 public class GamePanel extends Canvas {
     private Game game;
+    private Pause pause = new Pause();
     private MenuCallback menuCallback;
     private AnimationTimer gameTimer;
 
@@ -57,6 +58,8 @@ public class GamePanel extends Canvas {
                     public void handle(KeyEvent e) {
                         if (e.getCode() == KeyCode.LEFT) leftPressed = true;
                         if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
+
+                        if (e.getCode() == KeyCode.SPACE) pause.togglePause();
                         
                         // Xử lý phím khi game over
                         if (game.isGameOver()) {
@@ -139,6 +142,7 @@ public class GamePanel extends Canvas {
      * @param timeDistance khoảng tg giữa 2 frame.
      */
     private void updateGame(float timeDistance) {
+        if (pause.isPaused()) return;
         background.updateBackground();
         if (!game.isGameOver()) {
             if (leftPressed) game.getPaddle().moveLeft(timeDistance, game.getWidth()); // gọi method move
