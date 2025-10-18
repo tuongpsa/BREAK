@@ -59,6 +59,7 @@ public class HighScorePanel extends Canvas {
     }
     
     private void render() {
+
         GraphicsContext gc = getGraphicsContext2D();
         highScoreRenderer.render(gc, getWidth(), getHeight(), highScoreManager.getHighScores());
     }

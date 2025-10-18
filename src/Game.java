@@ -8,14 +8,14 @@ public class Game {
 
     private Ball ball;
     private final float ballRadius = 10;
-    private final float ballSpeed = 800.f;
+    private final float ballSpeed = 400.f;
 
     private Paddle paddle;
     private final float paddleWidth = width ;
     private final float paddleHeight = 10;
 
     private List<Brick> bricks = new ArrayList<>();
-    private final int maxBrick = 5;
+    private int maxBrick = 5;
 
     private int score = 0;
     private boolean gameOver = false;
@@ -69,6 +69,12 @@ public class Game {
     public void addScore(int s){ score += s; }
     public float getWidth(){ return width; }
     public float getHeight(){ return height; }
+
+    //setter cho maxBrick
+    public void setMaxBrick(int maxBrick) {
+        this.maxBrick = maxBrick;
+    }
+
 
     // Game over
     public boolean isGameOver(){ return gameOver; }

@@ -28,6 +28,11 @@ public class GamePanel extends Canvas {
     private HighScoreManager highScoreManager;
     private boolean highScoreProcessed = false;
 
+    private boolean paused = false;
+
+    private LevelManager levelManager;
+
+
     /**
      * Constructor có tham số.
      * @param width chiều dài
@@ -38,6 +43,7 @@ public class GamePanel extends Canvas {
         audioManager = new AudioManager();
         game = new Game(audioManager);
         highScoreManager = new HighScoreManager();
+        levelManager = new LevelManager();
 
         // Load ảnh cho object game
         ballImage = new Image("file:assets/ball.panda.png");// ảnh ball
@@ -57,7 +63,11 @@ public class GamePanel extends Canvas {
                     public void handle(KeyEvent e) {
                         if (e.getCode() == KeyCode.LEFT) leftPressed = true;
                         if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
-                        
+                        if (e.getCode() == KeyCode.SPACE) {
+                            paused = !paused;
+                        }
+
+
                         // Xử lý phím khi game over
                         if (game.isGameOver()) {
                             if (e.getCode() == KeyCode.R) {
@@ -73,6 +83,7 @@ public class GamePanel extends Canvas {
                         }
                     }
                 }
+
         );
         this.setOnKeyReleased( // ghi nhận sự kiện nhả phím
                 new EventHandler<KeyEvent>() {
@@ -139,7 +150,20 @@ public class GamePanel extends Canvas {
      * @param timeDistance khoảng tg giữa 2 frame.
      */
     private void updateGame(float timeDistance) {
+        if (paused) return; // bỏ qua nếu đang pause
+
+        if (game.getBricks().stream().allMatch(Brick::isDestroyed)) {
+            levelManager.levelUp(game);
+        }
+
+
         background.updateBackground();
+        if (!game.isGameOver()) {
+            if (leftPressed) game.getPaddle().moveLeft(timeDistance, game.getWidth());
+            if (rightPressed) game.getPaddle().moveRight(timeDistance, game.getWidth());
+            game.update(timeDistance);
+        }
+
         if (!game.isGameOver()) {
             if (leftPressed) game.getPaddle().moveLeft(timeDistance, game.getWidth()); // gọi method move
             if (rightPressed) game.getPaddle().moveRight(timeDistance, game.getWidth());
@@ -160,12 +184,25 @@ public class GamePanel extends Canvas {
         double paddleCenterX = paddle.getX() + paddle.getWidth() / 2;
         double paddleCenterY = paddle.getY() + paddle.getHeight() / 2;
         // vẽ paddle
+
+        if (paused) {
+            gc.setFill(Color.color(0, 0, 0, 0.5)); // phủ nền mờ
+            gc.fillRect(0, 0, getWidth(), getHeight());
+
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font(36));
+            gc.fillText("PAUSED", getWidth() / 2 - 60, getHeight() / 2);
+        }
+
+
         gc.drawImage(
                 paddleImage,
                 paddleCenterX - paddle.getWidth() / 2,   // tọa độ x
                 paddleCenterY - paddle.getHeight() / 2,  // tọa độ y
                 paddle.getWidth(),                 // width
                 paddle.getHeight()*5.5             // height
+
+
         );
 
         // Vẽ bóng

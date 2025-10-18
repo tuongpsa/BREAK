@@ -46,4 +46,8 @@ public class Paddle {
     public void setX(float x) {
         this.x = x;
     }
+
+    public void setWidth(float v) {
+        this.width = v;
+    }
 }
