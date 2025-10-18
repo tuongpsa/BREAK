@@ -220,7 +220,12 @@ public class GamePanel extends Canvas {
         // Vẽ điểm
         gc.setFill(Color.BLACK);
         gc.setFont(Font.font(18));
-        gc.fillText("Score: " + game.getScore(), 10, 20);
+        gc.fillText("Score: " + game.getScore(), 10, 40);
+
+        //vẽ level
+        gc.setFill(Color.BLACK);
+        gc.setFont(Font.font(18));
+        gc.fillText("Level: " + levelManager.getLevel(),10, 20);
 
         // Khi gameover
         if (game.isGameOver()) {

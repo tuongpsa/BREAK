@@ -134,7 +134,7 @@ public class Main extends Application {
         highScorePanel.resetBackToMenu();
         highScorePanel.requestFocus();
         
-        // Bắt đầu vòng lặp kiểm tra nút Back
+        // Bắt đầu vòng lặp kiểm tra nút Backl
         startHighScoreLoop();
     }
     

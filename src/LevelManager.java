@@ -6,6 +6,10 @@ public class LevelManager {
 
     public void levelUp(Game game) {
         level++;
+        // Reset lại vị trí ball và paddle
+        game.getBall().setX((game.getWidth() / 2) - game.getBall().getRadius());
+        game.getBall().setY(game.getHeight() - 30);
+        game.getBall().setVelY( Math.abs(game.getBall().getVelY())); // đảm bảo bóng đi lên
 
         // Tăng số lượng gạch
         int newBrickCount = baseBrickCount + (level - 1) * 5;

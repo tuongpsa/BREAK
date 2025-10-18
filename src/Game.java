@@ -25,7 +25,7 @@ public class Game {
 
     public Game(AudioManager audioManager) {
         this.audioManager = audioManager;
-        ball = new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed);
+        ball = new Ball((width/2)-ballRadius, height-20, ballRadius, ballSpeed);
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks();
     }
