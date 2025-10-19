@@ -205,15 +205,34 @@ public class GamePanel extends Canvas {
 
         );
 
-        // Vẽ bóng
-        Ball ball = game.getBall();
-        gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius() * 2, ball.getRadius() * 2);
+        // Vẽ tất cả bóng
+        for (Ball ball : game.getBalls()) {
+            gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius() * 2, ball.getRadius() * 2);
+        }
         
 
         // Vẽ gạch
         for (Brick brick : game.getBricks()) {
             if (!brick.isDestroyed()) {
                 gc.drawImage(brickImage, brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight());
+            }
+        }
+        
+        // Vẽ power-ups
+        for (PowerUp powerUp : game.getPowerUps()) {
+            if (powerUp.isActive()) {
+                // Vẽ power-up với màu khác nhau tùy theo loại
+                if (powerUp.getType() == PowerUpType.SCORE_MULTIPLIER) {
+                    gc.setFill(Color.GOLD);
+                } else if (powerUp.getType() == PowerUpType.MULTI_BALL) {
+                    gc.setFill(Color.CYAN);
+                }
+                gc.fillOval(powerUp.getX(), powerUp.getY(), powerUp.getWidth(), powerUp.getHeight());
+                
+                // Vẽ border
+                gc.setStroke(Color.BLACK);
+                gc.setLineWidth(2);
+                gc.strokeOval(powerUp.getX(), powerUp.getY(), powerUp.getWidth(), powerUp.getHeight());
             }
         }
 
@@ -226,6 +245,18 @@ public class GamePanel extends Canvas {
         gc.setFill(Color.BLACK);
         gc.setFont(Font.font(18));
         gc.fillText("Level: " + levelManager.getLevel(),10, 20);
+        
+        // Vẽ score multiplier
+        if (game.getScoreMultiplier() > 1) {
+            gc.setFill(Color.GOLD);
+            gc.setFont(Font.font(16));
+            gc.fillText("Score x" + game.getScoreMultiplier(), 10, 60);
+        }
+        
+        // Vẽ số lượng bóng
+        gc.setFill(Color.BLACK);
+        gc.setFont(Font.font(16));
+        gc.fillText("Balls: " + game.getBalls().size(), 10, 80);
 
         // Khi gameover
         if (game.isGameOver()) {
