@@ -2,12 +2,14 @@
   <library name="BREAK">
     <CLASSES>
       <root url="file://$PROJECT_DIR$" />
-      <root url="file://$PROJECT_DIR$/../../../../Java/javafx-sdk-25/lib" />
+      <root url="file://$USER_HOME$/.jdks/openjdk-25/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/src" />
+      <root url="file://$USER_HOME$/.jdks/openjdk-25/lib" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/../../../../Java/javafx-sdk-25/lib" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/.jdks/openjdk-25/lib" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/.jdks/openjdk-25/lib" recursive="false" type="SOURCES" />
   </library>
 </component>
