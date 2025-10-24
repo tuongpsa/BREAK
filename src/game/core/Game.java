@@ -9,6 +9,7 @@ import game.objects.PowerUp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Handler;
 
 public class Game {
     private final float width = 480;
@@ -19,7 +20,7 @@ public class Game {
     private final float ballSpeed = 250.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width*1/2 ;
+    private final float paddleWidth = width ;
     private final float paddleHeight = 10;
 
     private List<Brick> bricks = new ArrayList<>();
@@ -33,32 +34,66 @@ public class Game {
     private Random rand = new Random();
     private AudioManager audioManager;
 
+    private LevelManager levelManager = new LevelManager();
+
     public Game(AudioManager audioManager) {
         this.audioManager = audioManager;
         balls.add(new Ball((width/2)-ballRadius, height-20, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
-        createBricks();
+        createBricks(levelManager.getLevel());
     }
 
-    public void createBricks() {
+    public void createBricks(int currentLevel) {
+        System.out.println("Đang bắt đầu tạo gạch cho level: " + currentLevel);
         bricks.clear();
-        for (int i = 0; i < maxBrick; i++) {
-            boolean valid = false;
-            Brick brick = null;
-            while(!valid){
-                float x = 30 + rand.nextInt((int)(width - 60 - 60));
-                float y = 30 + rand.nextInt((int)(height/2));
-                int hp = 1 + rand.nextInt(3);
-                brick = new Brick(x, y, hp);
-                valid = true;
-                for (Brick other : bricks){
-                    if(brick.getBounds().intersects(other.getBounds())){
-                        valid = false; break;
-                    }
+
+        // Tạm thời tôi vẫn dùng đường dẫn tuyệt đối của bạn
+        String filePath = "D:/BREAK/levels/level" + currentLevel + ".txt";
+
+        int[][] layout = LevelLoader.loadLayoutFromFile(filePath);
+
+        if (layout == null || layout.length == 0) {
+            System.err.println("Không thể tải level " + currentLevel + " hoặc layout rỗng.");
+            gameOver = true; // Nếu không tải được level, nên cho game over
+            return;
+        }
+
+        // --- PHẦN BỊ THIẾU CỦA BẠN ĐÂY ---
+
+        // Giả sử bạn có các hằng số này (hoặc lấy chúng từ đâu đó)
+        float BRICK_WIDTH = 42;
+        float BRICK_HEIGHT = 20;
+        float PADDING = 5;
+        float OFFSET_TOP = 50;
+
+        for (int row = 0; row < layout.length; row++) {
+
+            // CĂN GIỮA
+            // Lấy số cột của hàng hiện tại
+            int numCols = layout[row].length;
+
+            // Tính tổng chiều rộng của layout này (N gạch và N-1 khoảng cách)
+            float totalLayoutWidth = (numCols * BRICK_WIDTH) + ((numCols - 1) * PADDING);
+
+            // Tính lề trái mới để căn giữa
+            float dynamicOffsetLeft = (width - totalLayoutWidth) / 2;
+            // --- CĂN GIỮA ---
+
+            for (int col = 0; col < numCols; col++) {
+                int hp = layout[row][col];
+
+                if (hp > 0) {
+                    // Dùng lề trái động, và công thức tính x ĐÚNG
+                    float x = dynamicOffsetLeft + col * (BRICK_WIDTH + PADDING);
+                    float y = OFFSET_TOP + row * (BRICK_HEIGHT + PADDING);
+
+                    Brick newBrick = new Brick(x, y, hp);
+                    bricks.add(newBrick);
                 }
             }
-            bricks.add(brick);
         }
+
+        System.out.println("Đã tạo thành công " + bricks.size() + " viên gạch.");
     }
 
     public void update(float deltaTime) {
@@ -73,7 +108,7 @@ public class Game {
         for (int i = powerUps.size() - 1; i >= 0; i--) {
             PowerUp powerUp = powerUps.get(i);
             powerUp.update(deltaTime);
-            
+
             // Remove power-ups that fell off screen or expired
             if (powerUp.getY() > height || powerUp.isExpired()) {
                 powerUps.remove(i);
@@ -98,9 +133,9 @@ public class Game {
     public int getScoreMultiplier(){ return scoreMultiplier; }
 
     //setter cho maxBrick
-    public void setMaxBrick(int maxBrick) {
+   /* public void setMaxBrick(int maxBrick) {
         this.maxBrick = maxBrick;
-    }
+    }*/
 
 
     // game.core.Game over
@@ -116,7 +151,7 @@ public class Game {
         balls.add(new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         powerUps.clear();
-        createBricks();
+        createBricks(levelManager.getLevel());
     }
     
     // Constructor mặc định cho tương thích ngược

@@ -6,7 +6,7 @@ public class Brick {
     private float x, y;
     private int hp;
     private boolean destroyed;
-    private int width = 60;
+    private int width = 42;
     private int height = 20;
 
     public Brick(float x, float y, int hp) {

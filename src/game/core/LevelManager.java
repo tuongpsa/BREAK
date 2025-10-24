@@ -21,12 +21,12 @@ public class LevelManager {
 
         // Tăng số lượng gạch
         int newBrickCount = baseBrickCount + (level - 1) * 5;
-        game.setMaxBrick(newBrickCount);
-        game.createBricks();
+        //game.setMaxBrick(newBrickCount);
+        game.createBricks(level);
 
         // Giảm kích thước paddle
-        paddleWidthMultiplier *= 0.9f; // Mỗi level giảm 10%
-        game.getPaddle().setWidth(game.getPaddle().getWidth() * paddleWidthMultiplier);
+       // paddleWidthMultiplier *= 0.9f; // Mỗi level giảm 10%
+        //game.getPaddle().setWidth(game.getPaddle().getWidth() * paddleWidthMultiplier);
 
         // Tăng tốc độ bóng
         ballSpeedMultiplier *= 1.15f; // tăng 15%
