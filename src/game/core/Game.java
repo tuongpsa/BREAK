@@ -20,7 +20,7 @@ public class Game {
     private final float ballSpeed = 250.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width ;
+    private final float paddleWidth = width/2 ;
     private final float paddleHeight = 10;
 
     private List<Brick> bricks = new ArrayList<>();
@@ -35,8 +35,10 @@ public class Game {
     private AudioManager audioManager;
 
     private LevelManager levelManager = new LevelManager();
+    private final CollisionHandler collisionHandler;
 
     public Game(AudioManager audioManager) {
+        this.collisionHandler = new CollisionHandler(audioManager, this.levelManager);
         this.audioManager = audioManager;
         balls.add(new Ball((width/2)-ballRadius, height-20, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
@@ -58,9 +60,7 @@ public class Game {
             return;
         }
 
-        // --- PHẦN BỊ THIẾU CỦA BẠN ĐÂY ---
 
-        // Giả sử bạn có các hằng số này (hoặc lấy chúng từ đâu đó)
         float BRICK_WIDTH = 42;
         float BRICK_HEIGHT = 20;
         float PADDING = 5;
@@ -115,8 +115,7 @@ public class Game {
             }
         }
 
-        CollisionHandler handler = new CollisionHandler(audioManager);
-        handler.handleBallBrickCollision(balls, deltaTime, bricks, this, paddle, powerUps);
+        collisionHandler.handleBallBrickCollision(balls, deltaTime, bricks, this, paddle, powerUps);
     }
 
 
@@ -161,6 +160,9 @@ public class Game {
     
     // Getter cho ballSpeed
     public float getBallSpeed() { return ballSpeed; }
+    public LevelManager getLevelManager() {
+        return this.levelManager;
+    }
     
     // Power-up methods
     public void activateScoreMultiplier() {
@@ -191,5 +193,9 @@ public class Game {
     
     public void removePowerUp(PowerUp powerUp) {
         powerUps.remove(powerUp);
+    }
+
+    public float getBallRadius() {
+        return ballRadius;
     }
 }

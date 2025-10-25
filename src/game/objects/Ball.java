@@ -4,6 +4,7 @@ public class Ball {
     private float x, y;
     private float velX, velY;
     private float radius;
+    private int n;
 
     public Ball(float x, float y, float radius, float speed) {
         this.x = x;
@@ -31,4 +32,5 @@ public class Ball {
     public void setY(float y) { this.y = y; }
     public void setVelX(float velX) { this.velX = velX; }
     public void setVelY(float velY) { this.velY = velY; }
+    public void setN(int n){this.n = n;}
 }

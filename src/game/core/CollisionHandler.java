@@ -8,10 +8,17 @@ import java.util.List;
 
 public class CollisionHandler {
     private final AudioManager audioManager;
-    
-    public CollisionHandler(AudioManager audioManager) {
+
+    //khai báo LevelManager
+    private final LevelManager levelManager;
+
+    //Thêm LevelManager vào constructor
+    public CollisionHandler(AudioManager audioManager, LevelManager levelManager) {
         this.audioManager = audioManager;
+        this.levelManager = levelManager; // Lưu lại LevelManager được chia sẻ
     }
+
+
     
     public void handleBallBrickCollision(List<Ball> balls, float deltaTime, List<Brick> bricks, Game game, Paddle paddle, List<PowerUp> powerUps) {
         float screenWidth = game.getWidth();
@@ -72,7 +79,38 @@ public class CollisionHandler {
                 ball.getX() <= paddle.getX() + paddle.getWidth()) {
 
             if (ball.getVelY() > 0) {
-                ball.reverseY();
+                // 1. Lấy vị trí tâm bóng và tâm thanh đỡ
+                float tamBongX = ball.getX() + ball.getRadius();
+                float tamThanhDoX = paddle.getX() + paddle.getWidth() / 2;
+
+                // 2. Tính vị trí va chạm tương đối
+                // (Giá trị từ -1.0 (mép trái) đến +1.0 (mép phải))
+                float viTriVaChamTuongDoiX = tamBongX - tamThanhDoX;
+                float viTriVaChamChuanHoaX = viTriVaChamTuongDoiX / (paddle.getWidth() / 2);
+
+                // 3. Giới hạn giá trị, đề phòng bóng đập vào cạnh
+                viTriVaChamChuanHoaX = Math.max(-1.0f, Math.min(1.0f, viTriVaChamChuanHoaX));
+
+                // 4. Lấy TỔNG tốc độ hiện tại của bóng (để bảo toàn tốc độ)
+                float tongTocDoHienTai = (float)Math.sqrt(ball.getVelX() * ball.getVelX() +
+                        ball.getVelY() * ball.getVelY());
+
+                // 5. Tính góc nảy.
+                // Chúng ta sẽ đổi giá trị -1.0 đến +1.0 thành một góc,
+                // ví dụ: tối đa 75 độ (khoảng 1.3 radians)
+                float gocNayToiDa = 1.3f; // 75 độ
+                float gocNay = viTriVaChamChuanHoaX * gocNayToiDa;
+
+                // 6. Dùng lượng giác (Sin và Cos) để tính vanTocX và vanTocY mới
+                float vanTocMoiX = tongTocDoHienTai * (float)Math.sin(gocNay);
+
+                // vanTocY phải là SỐ ÂM (để đi lên)
+                float vanTocMoiY = -tongTocDoHienTai * (float)Math.cos(gocNay);
+
+                // 7. Cập nhật vận tốc mới cho bóng
+                ball.setVelX(vanTocMoiX);
+                ball.setVelY(vanTocMoiY);
+                
                 if (audioManager != null) {
                     audioManager.playPaddleHit();
                 }
@@ -85,7 +123,9 @@ public class CollisionHandler {
 
             boolean collided = false;
 
-            for (Brick brick : bricks) {
+            for (int j = bricks.size() - 1; j >= 0; j--) {
+                Brick brick = bricks.get(j);
+
                 if (!brick.isDestroyed()) {
                     Rectangle rect = brick.getBounds();
                     boolean hitX = nextX + radius * 2 > rect.x && nextX < rect.x + rect.width;
@@ -111,13 +151,29 @@ public class CollisionHandler {
                         } else {
                             ball.setVelX(-ball.getVelX());
                         }
-                        
+
                         if (brick.isDestroyed()) {
                             game.addScore(10);
                             // Có 20% chance drop power-up
                             if (Math.random() < 1.0) {
                                 dropPowerUp(brick.getX(), brick.getY(), powerUps);
                             }
+
+                            // --- BẮT ĐẦU PHẦN SỬA LỖI ---
+
+                            // 1. Xóa gạch khỏi danh sách
+                            bricks.remove(j); // 'j' là chỉ số từ vòng lặp ngược
+
+                            // 2. Kiểm tra xem đã hết gạch chưa
+                            if (bricks.isEmpty()) {
+                                // In ra để debug
+                                System.out.println("GẠCH CUỐI CÙNG ĐÃ BỊ PHÁ! GỌI LEVEL UP!");
+
+                                // Gọi hàm level up
+                                levelManager.levelUp(game);
+                            }
+
+                            // --- KẾT THÚC PHẦN SỬA LỖI ---
                         }
 
                         collided = true;

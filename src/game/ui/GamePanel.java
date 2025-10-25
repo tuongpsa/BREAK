@@ -39,7 +39,7 @@ public class GamePanel extends Canvas {
 
     private boolean paused = false;
 
-    private LevelManager levelManager;
+
 
 
     /**
@@ -52,7 +52,6 @@ public class GamePanel extends Canvas {
         audioManager = new AudioManager();
         game = new Game(audioManager);
         highScoreManager = new HighScoreManager();
-        levelManager = new LevelManager();
 
         // Load ảnh cho object game
         ballImage = new Image("file:assets/ball.panda.png");// ảnh ball
@@ -162,7 +161,7 @@ public class GamePanel extends Canvas {
         if (paused) return; // bỏ qua nếu đang pause
 
         if (game.getBricks().stream().allMatch(Brick::isDestroyed)) {
-            levelManager.levelUp(game);
+            game.getLevelManager().getLevel();
         }
 
 
@@ -253,7 +252,7 @@ public class GamePanel extends Canvas {
         //vẽ level
         gc.setFill(Color.BLACK);
         gc.setFont(Font.font(18));
-        gc.fillText("Level: " + levelManager.getLevel(),10, 20);
+        gc.fillText("Level: " + game.getLevelManager().getLevel(),10, 20);
         
         // Vẽ score multiplier
         if (game.getScoreMultiplier() > 1) {
