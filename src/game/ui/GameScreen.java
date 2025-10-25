@@ -1,0 +1,76 @@
+package game.ui;
+
+import game.audio.AudioManager;
+import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
+/**
+ * Lớp cơ sở cho mọi màn hình game.
+ */
+public abstract class GameScreen extends Canvas {
+    protected AudioManager audioManager;
+    protected boolean leftPressed = false;
+    protected boolean rightPressed = false;
+    protected boolean paused = false;
+
+    private AnimationTimer gameTimer;
+
+    public GameScreen(double width, double height) {
+        super(width, height);
+        audioManager = new AudioManager();
+        this.setFocusTraversable(true);
+
+        // Xử lý phím nhấn
+        this.setOnKeyPressed(this::handleKeyPressed);
+        this.setOnKeyReleased(this::handleKeyReleased);
+    }
+
+    // Abstract methods mà màn hình con phải implement
+    protected abstract void updateGame(float deltaTime);
+    protected abstract void renderGame();
+
+    // Start game loop
+    public void startGameLoop() {
+        if (gameTimer != null) gameTimer.stop();
+
+        gameTimer = new AnimationTimer() {
+            private long lastTime = 0;
+
+            @Override
+            public void handle(long now) {
+                if (lastTime > 0) {
+                    float deltaTime = (now - lastTime) / 1_000_000_000f;
+                    if (!paused) updateGame(deltaTime);
+                    renderGame();
+                }
+                lastTime = now;
+            }
+        };
+        gameTimer.start();
+
+        if (audioManager != null) audioManager.playGameMusic();
+    }
+
+    public void stopGameLoop() {
+        if (gameTimer != null) gameTimer.stop();
+        if (audioManager != null) audioManager.stopGameMusic();
+    }
+
+    // Xử lý phím
+    protected void handleKeyPressed(KeyEvent e) {
+        if (e.getCode() == KeyCode.LEFT) leftPressed = true;
+        if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
+        if (e.getCode() == KeyCode.SPACE) paused = !paused;
+    }
+
+    protected void handleKeyReleased(KeyEvent e) {
+        if (e.getCode() == KeyCode.LEFT) leftPressed = false;
+        if (e.getCode() == KeyCode.RIGHT) rightPressed = false;
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+}

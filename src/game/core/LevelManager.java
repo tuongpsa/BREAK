@@ -1,15 +1,21 @@
 package game.core;
 
 import game.objects.Ball;
+import game.render.LevelRender;
 
 public class LevelManager {
     private int level = 1;            // cấp hiện tại
     private int baseBrickCount = 5;   // số brick cơ bản ban đầu
     private float ballSpeedMultiplier = 1.0f; // hệ số tốc độ bóng
     private float paddleWidthMultiplier = 1.0f; // hệ số chiều dài paddle
+    private LevelRender levelRender;
 
     public void levelUp(Game game) {
         level++;
+        if (levelRender != null) {
+            levelRender.showLevel(level);
+        }
+
         // Reset lại vị trí ball và paddle
         game.getBall().setX((game.getWidth() / 2) - game.getBall().getRadius());
         game.getBall().setY(game.getHeight() - 30);
@@ -51,4 +57,9 @@ public class LevelManager {
     public int getLevel() {
         return level;
     }
+
+    public void setLevelRender(LevelRender levelRender) {
+        this.levelRender = levelRender;
+    }
+
 }

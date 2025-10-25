@@ -50,7 +50,7 @@ public class Game {
         bricks.clear();
 
         // Tạm thời tôi vẫn dùng đường dẫn tuyệt đối của bạn
-        String filePath = "D:/BREAK/levels/level" + currentLevel + ".txt";
+        String filePath = "levels/level" + currentLevel + ".txt";
 
         int[][] layout = LevelLoader.loadLayoutFromFile(filePath);
 
@@ -140,7 +140,7 @@ public class Game {
     // game.core.Game over
     public boolean isGameOver(){ return gameOver; }
     public void setGameOver(boolean b){ gameOver = b; }
-    
+
     // Thêm method để reset game
     public void resetGame() {
         gameOver = false;
@@ -152,31 +152,31 @@ public class Game {
         powerUps.clear();
         createBricks(levelManager.getLevel());
     }
-    
+
     // Constructor mặc định cho tương thích ngược
     public Game() {
         this(null);
     }
-    
+
     // Getter cho ballSpeed
     public float getBallSpeed() { return ballSpeed; }
     public LevelManager getLevelManager() {
         return this.levelManager;
     }
-    
+
     // Power-up methods
     public void activateScoreMultiplier() {
         scoreMultiplier = 2;
     }
-    
+
     public void activateMultiBall() {
         if (balls.size() < 5) { // Giới hạn tối đa 5 bóng
             Ball originalBall = balls.get(0);
             for (int i = 0; i < 2; i++) {
                 Ball newBall = new Ball(
-                    originalBall.getX() + (i - 1) * 20, 
-                    originalBall.getY(), 
-                    ballRadius, 
+                    originalBall.getX() + (i - 1) * 20,
+                    originalBall.getY(),
+                    ballRadius,
                     ballSpeed
                 );
                 // Tạo góc khác nhau cho các bóng
@@ -186,11 +186,11 @@ public class Game {
             }
         }
     }
-    
+
     public void addPowerUp(PowerUp powerUp) {
         powerUps.add(powerUp);
     }
-    
+
     public void removePowerUp(PowerUp powerUp) {
         powerUps.remove(powerUp);
     }
