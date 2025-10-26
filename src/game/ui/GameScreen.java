@@ -30,6 +30,10 @@ public abstract class GameScreen extends Canvas {
     // Abstract methods mà màn hình con phải implement
     protected abstract void updateGame(float deltaTime);
     protected abstract void renderGame();
+    
+    // Abstract methods cho xử lý phím game over
+    protected abstract void handleRestartKey();
+    protected abstract void handleQuitKey();
 
     // Start game loop
     public void startGameLoop() {
@@ -60,9 +64,21 @@ public abstract class GameScreen extends Canvas {
 
     // Xử lý phím
     protected void handleKeyPressed(KeyEvent e) {
+        System.out.println("Key pressed: " + e.getCode()); // Debug
+        
         if (e.getCode() == KeyCode.LEFT) leftPressed = true;
         if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
         if (e.getCode() == KeyCode.SPACE) paused = !paused;
+        
+        // Xử lý phím khi game over
+        if (e.getCode() == KeyCode.R) {
+            System.out.println("R key pressed - calling handleRestartKey");
+            handleRestartKey();
+        }
+        if (e.getCode() == KeyCode.ESCAPE) {
+            System.out.println("ESC key pressed - calling handleQuitKey");
+            handleQuitKey();
+        }
     }
 
     protected void handleKeyReleased(KeyEvent e) {

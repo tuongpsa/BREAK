@@ -119,6 +119,8 @@ public class GamePanel extends GameScreen {
             if (!highScoreProcessed) {
                 processHighScore();
                 highScoreProcessed = true;
+                // Đảm bảo có focus để nhận phím
+                this.requestFocus();
             }
 
             gameOverRenderer = new GameOverRenderer();
@@ -154,5 +156,26 @@ public class GamePanel extends GameScreen {
 
     public void setMenuCallback(MenuCallback callback) {
         this.menuCallback = callback;
+    }
+
+    @Override
+    protected void handleRestartKey() {
+        // Chỉ restart khi game over
+        if (game.isGameOver()) {
+            System.out.println("Restarting game...");
+            game.resetGame();
+            highScoreProcessed = false;
+        }
+    }
+
+    @Override
+    protected void handleQuitKey() {
+        // Chỉ quit khi game over
+        if (game.isGameOver()) {
+            System.out.println("Quitting to menu...");
+            if (menuCallback != null) {
+                menuCallback.returnToMenu();
+            }
+        }
     }
 }

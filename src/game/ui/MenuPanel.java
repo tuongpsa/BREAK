@@ -5,11 +5,11 @@ import game.render.MenuRenderer;
 import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 
 /**
- * Class để quản lý menu chính và xử lý sự kiện chuột
+ * MenuPanel class gộp tất cả logic - không cần kế thừa phức tạp
+ * Có thể xử lý nhiều loại menu khác nhau
  */
 public class MenuPanel extends Canvas {
     private MenuRenderer menuRenderer;
@@ -17,6 +17,7 @@ public class MenuPanel extends Canvas {
     private boolean startGame = false;
     private boolean quitGame = false;
     private boolean showHighScore = false;
+    private boolean resumeGame = false; // Cho pause menu
 
     public MenuPanel(double width, double height) {
         super(width, height);
@@ -32,19 +33,7 @@ public class MenuPanel extends Canvas {
             public void handle(MouseEvent event) {
                 double mouseX = event.getX();
                 double mouseY = event.getY();
-
-                // Kiểm tra click vào nút Start game.core.Game
-                if (isPointInStartButton(mouseX, mouseY)) {
-                    startGame = true;
-                }
-                // Kiểm tra click vào nút High Score
-                else if (isPointInHighScoreButton(mouseX, mouseY)) {
-                    showHighScore = true;
-                }
-                // Kiểm tra click vào nút Quit
-                else if (isPointInQuitButton(mouseX, mouseY)) {
-                    quitGame = true;
-                }
+                handleMouseClick(mouseX, mouseY);
             }
         });
 
@@ -52,7 +41,7 @@ public class MenuPanel extends Canvas {
         this.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // Có thể thêm hiệu ứng highlight nút khi hover
+                handleMouseMove(event.getX(), event.getY());
             }
         });
 
@@ -63,6 +52,29 @@ public class MenuPanel extends Canvas {
         if (audioManager != null) {
             audioManager.playMenuMusic();
         }
+    }
+
+    private void handleMouseClick(double x, double y) {
+        // Kiểm tra click vào nút Start game
+        if (isPointInStartButton(x, y)) {
+            startGame = true;
+        }
+        // Kiểm tra click vào nút High Score
+        else if (isPointInHighScoreButton(x, y)) {
+            showHighScore = true;
+        }
+        // Kiểm tra click vào nút Resume (cho pause menu)
+        else if (isPointInResumeButton(x, y)) {
+            resumeGame = true;
+        }
+        // Kiểm tra click vào nút Quit
+        else if (isPointInQuitButton(x, y)) {
+            quitGame = true;
+        }
+    }
+
+    private void handleMouseMove(double x, double y) {
+        // Có thể thêm hiệu ứng highlight nút khi hover
     }
 
     private boolean isPointInStartButton(double x, double y) {
@@ -80,6 +92,16 @@ public class MenuPanel extends Canvas {
         double buttonHeight = 50;
         double buttonX = (getWidth() - buttonWidth) / 2;
         double buttonY = getHeight() / 2 + 20;
+
+        return x >= buttonX && x <= buttonX + buttonWidth &&
+               y >= buttonY && y <= buttonY + buttonHeight;
+    }
+
+    private boolean isPointInResumeButton(double x, double y) {
+        double buttonWidth = 200;
+        double buttonHeight = 50;
+        double buttonX = (getWidth() - buttonWidth) / 2;
+        double buttonY = getHeight() / 2 - 60;
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                y >= buttonY && y <= buttonY + buttonHeight;
@@ -106,8 +128,7 @@ public class MenuPanel extends Canvas {
     }
 
     private void render() {
-        GraphicsContext gc = getGraphicsContext2D();
-        menuRenderer.render(gc, getWidth(), getHeight());
+        menuRenderer.render(getGraphicsContext2D(), getWidth(), getHeight());
     }
 
     // Getters
@@ -123,6 +144,10 @@ public class MenuPanel extends Canvas {
         return showHighScore;
     }
 
+    public boolean isResumeGame() {
+        return resumeGame;
+    }
+
     public void resetStartGame() {
         startGame = false;
     }
@@ -133,6 +158,10 @@ public class MenuPanel extends Canvas {
 
     public void resetShowHighScore() {
         showHighScore = false;
+    }
+
+    public void resetResumeGame() {
+        resumeGame = false;
     }
 
     public void stopMenuMusic() {
