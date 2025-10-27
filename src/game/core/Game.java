@@ -101,7 +101,7 @@ public class Game {
 
         // Update balls
         for (Ball ball : balls) {
-            ball.move(deltaTime);
+            ball.update(deltaTime);
         }
 
         // Update power-ups

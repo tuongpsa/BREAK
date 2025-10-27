@@ -159,12 +159,10 @@ public class CollisionHandler {
                                 dropPowerUp(brick.getX(), brick.getY(), powerUps);
                             }
 
-                            // --- BẮT ĐẦU PHẦN SỬA LỖI ---
 
-                            // 1. Xóa gạch khỏi danh sách
                             bricks.remove(j); // 'j' là chỉ số từ vòng lặp ngược
 
-                            // 2. Kiểm tra xem đã hết gạch chưa
+                            // Kiểm tra xem đã hết gạch chưa
                             if (bricks.isEmpty()) {
                                 // In ra để debug
                                 System.out.println("GẠCH CUỐI CÙNG ĐÃ BỊ PHÁ! GỌI LEVEL UP!");
@@ -173,7 +171,6 @@ public class CollisionHandler {
                                 levelManager.levelUp(game);
                             }
 
-                            // --- KẾT THÚC PHẦN SỬA LỖI ---
                         }
 
                         collided = true;
@@ -199,6 +196,7 @@ public class CollisionHandler {
                 powerUp.getY() <= paddle.getY() + paddle.getHeight() &&
                 powerUp.getX() + powerUp.getWidth() >= paddle.getX() &&
                 powerUp.getX() <= paddle.getX() + paddle.getWidth()) {
+                System.out.println("Power-up " + powerUp.getType() + " đã được kích hoạt!");
                 
                 // Kích hoạt power-up
                 switch (powerUp.getType()) {

@@ -1,55 +1,54 @@
 package game.objects;
 
-public class Paddle {
-    private float x, y; //vị trí ban đầu
-    private float width, height; //chiều dài,chiều cao ban đầu
-    private float speed = 400.f; // tốc độ thanh đỡ ban đầu
+/**
+ * Lớp Paddle (thanh đỡ) kế thừa từ GameObject.
+ */
+public class Paddle extends GameObject {
 
-    public Paddle(float startX, float startY, float width, float height) {
-        this.x = startX;
-        this.y = startY;
-        this.width = width;
-        this.height = height;
+    private static final float MOVE_SPEED = 350f;
+
+    /**
+     * Constructor cho Paddle.
+     */
+    public Paddle(float x, float y, float width, float height) {
+        super(x, y, width, height);
     }
 
-    // paddle di chuyển trái phải
-    public void moveLeft(float deltaTime, float screenWidth) {
-        x -= speed * deltaTime;
-        if (x < 0) {
-            x = 0; // không cho vượt ra ngoài bên trái
+    /**
+     * Hàm update() để trống, vì gọi move() từ bên ngoài.
+     */
+    @Override
+    public void update(float deltaTime) {
+    }
+
+    // --- SỬA ĐỔI HÀM NÀY ---
+    /**
+     * Di chuyển thanh đỡ sang trái.
+     * @param deltaTime Thời gian giữa 2 frame
+     * @param gameWidth Chiều rộng màn hình (được truyền vào nhưng không dùng)
+     */
+    public void moveLeft(float deltaTime, float gameWidth) {
+        // di chuyển sang trái
+        this.x -= MOVE_SPEED * deltaTime;
+
+        // Kiểm tra va chạm với tường bên trái
+        if (this.x < 0) {
+            this.x = 0;
         }
     }
 
-    public void moveRight(float deltaTime, float screenWidth) {
-        x += speed * deltaTime;
-        if (x + width > screenWidth) {
-            x = screenWidth - width; // không cho vượt ra ngoài bên phải
+    /**
+     * Di chuyển thanh đỡ sang phải, có kiểm tra va chạm tường.
+     * @param deltaTime Thời gian giữa 2 frame
+     * @param gameWidth Chiều rộng của màn hình game
+     */
+    public void moveRight(float deltaTime, float gameWidth) {
+        // di chuyển sang phải
+        this.x += MOVE_SPEED * deltaTime;
+
+        // Kiểm tra va chạm với tường bên phải
+        if (this.x + this.width > gameWidth) {
+            this.x = gameWidth - this.width;
         }
-    }
-
-
-    // getter,setter
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setX(float x) {
-        this.x = x;
-    }
-
-    public void setWidth(float v) {
-        this.width = v;
     }
 }
