@@ -40,11 +40,11 @@ public class GamePanel extends GameScreen {
         levelRender = new LevelRender();
         game.getLevelManager().setLevelRender(levelRender);
 
-        ballImage = new Image("file:assets/ball.panda.png");
-        paddleImage = new Image("file:assets/sword.png");
-        brickImage = new Image("file:assets/thanh2.png");
+        ballImage = new Image("file:assets/bóng.png");
+        paddleImage = new Image("file:assets/haiz.png");
+        brickImage = new Image("file:assets/brick1.jpg");
 
-        background = new Background("assets/sky.png","assets/mountain.png","assets/cloud1.png",0.3,0.6);
+        background = new Background("assets/backgroundtest.jpeg");
 
         if (ballImage.isError() || paddleImage.isError() || brickImage.isError()) {
             System.out.println("Object game is error");
@@ -54,9 +54,7 @@ public class GamePanel extends GameScreen {
     @Override
     protected void updateGame(float deltaTime) {
         if (paused) return;
-
-        background.updateBackground();
-
+        
         if (!game.isGameOver()) {
             if (leftPressed) game.getPaddle().moveLeft(deltaTime, game.getWidth());
             if (rightPressed) game.getPaddle().moveRight(deltaTime, game.getWidth());
@@ -105,7 +103,7 @@ public class GamePanel extends GameScreen {
         }
 
         // Vẽ điểm, level
-        gc.setFill(Color.BLACK);
+        gc.setFill(Color.WHITE);
         gc.setFont(Font.font(18));
         gc.fillText("Score: " + game.getScore(),10,40);
         gc.fillText("Level: " + game.getLevelManager().getLevel(),10,20);

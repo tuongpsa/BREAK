@@ -7,7 +7,7 @@ package game.objects;
  */
 public class Brick extends GameObject {
     //  kích thước mặc định của gạch
-    public static final int DEFAULT_WIDTH = 42;
+    public static final int DEFAULT_WIDTH = 45;
     public static final int DEFAULT_HEIGHT = 20;
 
     private int hp; // Máu của gạch

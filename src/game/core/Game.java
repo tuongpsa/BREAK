@@ -16,12 +16,12 @@ public class Game {
     private final float height = 720;
 
     private List<Ball> balls = new ArrayList<>();
-    private final float ballRadius = 10;
+    private final float ballRadius = 15;
     private final float ballSpeed = 250.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width/2 ;
-    private final float paddleHeight = 10;
+    private final float paddleWidth = width/4 ;
+    private final float paddleHeight = 7;
 
     private List<Brick> bricks = new ArrayList<>();
     private int maxBrick = 5;
