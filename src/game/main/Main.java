@@ -1,15 +1,28 @@
 package game.main;
 
+import game.audio.AudioManager;
+import game.core.GameSettings;
+import game.core.PauseListener;
+import game.core.PauseManager;
 import game.ui.GamePanel;
 import game.ui.HighScorePanel;
 import game.ui.MenuPanel;
+import game.ui.PauseMenu;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
+    private GameSettings gameSettings;
+    private AudioManager audioManager;
+    private PauseManager pauseManager;
+    private PauseMenu pauseMenu;
+
     private Stage primaryStage;
     private GamePanel gamePanel;
     private MenuPanel menuPanel;
@@ -18,13 +31,19 @@ public class Main extends Application {
     private Scene menuScene;
     private Scene highScoreScene;
     private AnimationTimer gameOverTimer;
-    
+
+
     @Override // ghi đè lên phg thức start của lớp Application
     public void start(Stage stage) {
         this.primaryStage = stage;
+
+        gameSettings = new GameSettings();
+        // Truyền settings vào AudioManager
+        audioManager = new AudioManager(gameSettings);
+        pauseManager = new PauseManager();
         
         // Tạo menu panel
-        menuPanel = new MenuPanel(480, 820);
+        menuPanel = new MenuPanel(480, 820, audioManager);
         StackPane menuRoot = new StackPane(menuPanel);
         menuScene = new Scene(menuRoot, 480, 820);
         
@@ -34,21 +53,76 @@ public class Main extends Application {
         highScoreScene = new Scene(highScoreRoot, 480, 820);
         
         // Tạo game panel
-        gamePanel = new GamePanel(480, 820);
-        StackPane gameRoot = new StackPane(gamePanel);
+        // 1. Tạo GamePanel và TRUYỀN các hệ thống vào
+        // (Bạn cần sửa constructor của GamePanel.java để nhận chúng)
+        gamePanel = new GamePanel(480, 820, gameSettings, audioManager, pauseManager);
+
+        // 2. Tạo PauseMenu (UI)
+        pauseMenu = new PauseMenu(
+                pauseManager,
+                gameSettings,
+                audioManager,
+                () -> gamePanel.getGame().resetGame(), // Hàm Restart
+                this::switchToMenu                      // Hàm Exit (quay về Menu)
+        );
+
+        // 3. Dùng StackPane để xếp chồng PauseMenu LÊN TRÊN GamePanel
+        StackPane gameRoot = new StackPane(gamePanel, pauseMenu.getRootNode());
         gameScene = new Scene(gameRoot, 480, 820);
 
-        stage.setTitle("game.objects.Brick Breaker Demo"); // tên tiêu đề
-        stage.setScene(menuScene); // hiển thị menu trước
-        stage.show(); // show cửa sổ game
-        
-        // Đảm bảo menu panel nhận focus
+        stage.setTitle("Brick Breaker Demo");
+        stage.setScene(menuScene);
+        stage.show();
+
+        // 4. Thiết lập Input và Listener (Rất quan trọng)
+        setupGameInput(gameScene);
+        setupPauseListeners();
+
         menuPanel.requestFocus();
-        
-        // Bắt đầu vòng lặp kiểm tra menu
         startMenuLoop();
     }
-    
+    // <<< THÊM HÀM 1: Hàm setupPauseListeners() bị thiếu
+    /**
+     * Kết nối PauseManager với PauseMenu
+     * để tự động ẨN/HIỆN menu khi pause/resume.
+     */
+    private void setupPauseListeners() {
+        pauseManager.addListener(new PauseListener() {
+            @Override
+            public void onGamePaused() {
+                Platform.runLater(() -> pauseMenu.show());
+            }
+
+            @Override
+            public void onGameResumed() {
+                Platform.runLater(() -> {
+                    pauseMenu.hide();
+                    gamePanel.requestFocus(); // Lấy lại focus cho game
+                });
+            }
+        });
+    }
+
+    // <<< THÊM HÀM 2: Hàm setupInputHandlers() bị thiếu
+    /**
+     * Thiết lập xử lý input (phím ESC) cho GameScene.
+     * Các phím di chuyển (A/D, Mũi tên) đã được GamePanel tự xử lý.
+     */
+    private void setupGameInput(Scene scene) {
+        scene.setOnKeyPressed(e -> {
+            // Luôn bắt phím ESC để pause/toggle
+            if (e.getCode() == KeyCode.ESCAPE) {
+                // Nếu game over, phím ESC sẽ do GamePanel xử lý (để quit)
+                if (gamePanel != null && !gamePanel.getGame().isGameOver()) {
+                    pauseManager.toggle();
+                }
+            }
+
+            // Các phím khác (R, A, D, Left, Right)
+            // sẽ tự động được GamePanel xử lý
+            // vì GamePanel (GameScreen) cũng có listener riêng.
+        });
+    }
     private void startMenuLoop() {
         AnimationTimer menuTimer = new AnimationTimer() {
             @Override
@@ -76,23 +150,19 @@ public class Main extends Application {
         if (menuPanel != null) {
             menuPanel.stopMenuMusic();
         }
-        
-        // Reset game nếu gamePanel đã tồn tại
-        if (gamePanel != null) {
-            gamePanel.getGame().resetGame();
-        } else {
-            // Tạo gamePanel mới chỉ lần đầu
-            gamePanel = new GamePanel(480, 820);
-            StackPane gameRoot = new StackPane(gamePanel);
-            gameScene = new Scene(gameRoot, 480, 820);
-        }
-        
+// <<< SỬA LỖI 2: Xóa khối "else"
+        // GamePanel đã được khởi tạo 1 lần (và duy nhất) trong hàm start().
+        // Chúng ta chỉ cần reset game.
+        gamePanel.getGame().resetGame();
+
         primaryStage.setScene(gameScene);
-        gamePanel.setMenuCallback(() -> switchToMenu());
+        gamePanel.setMenuCallback(this::switchToMenu);
         gamePanel.startGameLoop();
         gamePanel.requestFocus();
-        
-        // Thêm vòng lặp kiểm tra game over để quay về menu
+
+        // Gắn input (phím ESC) cho GameScene
+        setupGameInput(gameScene);
+
         startGameOverLoop();
     }
     
@@ -101,13 +171,10 @@ public class Main extends Application {
         if (gameOverTimer != null) {
             gameOverTimer.stop();
         }
-        
         gameOverTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (gamePanel.getGame().isGameOver()) {
-                    // Không cần xử lý phím ở đây, game.ui.GamePanel sẽ tự xử lý
-                }
+                // (Không cần làm gì, GamePanel tự xử lý input R/ESC)
             }
         };
         gameOverTimer.start();
@@ -126,11 +193,12 @@ public class Main extends Application {
         menuPanel.requestFocus();
         
         // Bắt đầu lại nhạc menu
-        if (menuPanel != null) {
-            menuPanel.stopMenuMusic(); // Dừng nhạc cũ trước
-            // Nhạc menu sẽ tự động bắt đầu lại trong game.ui.MenuPanel constructor
+// <<< SỬA LỖI 3: Khởi động lại nhạc menu
+        // Dùng AudioManager trung tâm
+        if (audioManager != null) {
+            audioManager.playMenuMusic();
         }
-        
+
         startMenuLoop();
     }
     

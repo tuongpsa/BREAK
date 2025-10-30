@@ -19,10 +19,11 @@ public class MenuPanel extends Canvas {
     private boolean showHighScore = false;
     private boolean resumeGame = false; // Cho pause menu
 
-    public MenuPanel(double width, double height) {
+    public MenuPanel(double width, double height, AudioManager audioManager) {
         super(width, height);
         menuRenderer = new MenuRenderer();
-        audioManager = new AudioManager();
+
+        this.audioManager = audioManager;
 
         // Thiết lập để nhận sự kiện chuột
         this.setFocusTraversable(true);
@@ -49,8 +50,8 @@ public class MenuPanel extends Canvas {
         startMenuLoop();
 
         // Bắt đầu nhạc menu
-        if (audioManager != null) {
-            audioManager.playMenuMusic();
+        if (this.audioManager != null) {
+            this.audioManager.playMenuMusic();
         }
     }
 

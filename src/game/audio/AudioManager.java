@@ -1,5 +1,6 @@
 package game.audio;
 
+import game.core.GameSettings;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -24,22 +25,27 @@ public class AudioManager {
     private boolean soundEnabled = true;
     private boolean musicEnabled = true;
     private boolean initialized = false;
-    
-    public AudioManager() {
+
+    private GameSettings gameSettings;
+    public AudioManager(){};
+
+    public AudioManager(GameSettings settings) {
+        this.gameSettings = settings;
+
         if (initialized) {
             return; // Tránh khởi tạo nhiều lần
         }
-        
+
         try {
             // Load MP3 music với JavaFX Media
             loadMP3Music();
-            
+
             // Load WAV sound effects với Java Sound API
             loadWAVSounds();
-            
+
             initialized = true;
             System.out.println("game.audio.AudioManager initialized with hybrid approach (MP3 + WAV)");
-            
+
         } catch (Exception e) {
             System.out.println("Không thể load âm thanh: " + e.getMessage());
             createDefaultSounds();
@@ -49,18 +55,20 @@ public class AudioManager {
     private void loadMP3Music() {
         try {
             // Load menu music MP3
-            String menuMusicPath = "file:///D:/BREAK/assets/menu_music.mp3";
+            File menuMusicFile = new File("assets/menu_music.mp3");
+            String menuMusicPath = menuMusicFile.toURI().toString();
             Media menuMedia = new Media(menuMusicPath);
             menuMusic = new MediaPlayer(menuMedia);
             menuMusic.setCycleCount(MediaPlayer.INDEFINITE);
-            menuMusic.setVolume(0.3);
+            menuMusic.setVolume(gameSettings.getMusicVolume());
             
             // Load game music MP3
-            String gameMusicPath = "file:///D:/BREAK/assets/game_music.mp3";
+            File gameMusicFile = new File("assets/game_music.mp3");
+            String gameMusicPath = gameMusicFile.toURI().toString();
             Media gameMedia = new Media(gameMusicPath);
             gameMusic = new MediaPlayer(gameMedia);
             gameMusic.setCycleCount(MediaPlayer.INDEFINITE);
-            gameMusic.setVolume(0.3);
+            menuMusic.setVolume(gameSettings.getMusicVolume());
             
             System.out.println("MP3 music loaded successfully");
             
@@ -204,5 +212,36 @@ public class AudioManager {
         if (brickHitClip != null) brickHitClip.close();
         if (paddleHitClip != null) paddleHitClip.close();
         if (gameOverClip != null) gameOverClip.close();
+    }
+    /**
+     * Cập nhật âm lượng nhạc (MP3) ngay lập tức.
+     * Được gọi bởi thanh trượt (slider) trong PauseMenu.
+     * @param volume Giá trị từ 0.0 đến 1.0
+     */
+    public void setMusicVolume(double volume) {
+        // 1. Lưu cài đặt mới
+        gameSettings.setMusicVolume(volume);
+
+        // 2. Áp dụng ngay cho nhạc đang chạy (nếu có)
+        if (menuMusic != null) {
+            menuMusic.setVolume(volume);
+        }
+        if (gameMusic != null) {
+            gameMusic.setVolume(volume);
+        }
+    }
+
+    /**
+     * Cập nhật âm lượng hiệu ứng (WAV).
+     * @param volume Giá trị từ 0.0 đến 1.0
+     */
+    public void setSoundEffectsVolume(double volume) {
+        // 1. Lưu cài đặt mới
+        gameSettings.setSfxVolume(volume);
+
+        // 2. Áp dụng cho các Clip (phức tạp hơn, cần dùng FloatControl)
+        // Tạm thời chúng ta sẽ bỏ qua bước 2, chỉ lưu cài đặt.
+        // Bạn có thể tìm hiểu "Java FloatControl.MASTER_GAIN" để triển khai sau
+        System.out.println("SFX Volume đã được lưu: " + volume + " (Logic áp dụng cho Clip chưa triển khai)");
     }
 }

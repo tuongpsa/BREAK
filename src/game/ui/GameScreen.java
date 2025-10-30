@@ -1,6 +1,7 @@
 package game.ui;
 
 import game.audio.AudioManager;
+import game.core.PauseManager;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyCode;
@@ -10,15 +11,18 @@ import javafx.scene.input.KeyEvent;
  */
 public abstract class GameScreen extends Canvas {
     protected AudioManager audioManager;
+    protected PauseManager pauseManager;
+
     protected boolean leftPressed = false;
     protected boolean rightPressed = false;
-    protected boolean paused = false;
 
     private AnimationTimer gameTimer;
 
-    public GameScreen(double width, double height) {
+    public GameScreen(double width, double height, AudioManager audioManager, PauseManager pauseManager) {
         super(width, height);
-        audioManager = new AudioManager();
+        this.audioManager = audioManager;
+        this.pauseManager = pauseManager;
+
         this.setFocusTraversable(true);
 
         // Xử lý phím nhấn
@@ -43,12 +47,18 @@ public abstract class GameScreen extends Canvas {
 
             @Override
             public void handle(long now) {
-                if (lastTime > 0) {
-                    float deltaTime = (now - lastTime) / 1_000_000_000f;
-                    if (!paused) updateGame(deltaTime);
-                    renderGame();
+                if (lastTime == 0) {
+                    lastTime = now;
+                    return;
                 }
-                lastTime = now;
+
+                float deltaTime = (now - lastTime) / 1_000_000_000f;
+                lastTime = now; // Cập nhật lastTime ngay lập tức
+                // Chỉ update logic nếu không pause
+                if (!pauseManager.isPaused()) {
+                    updateGame(deltaTime);
+                }
+                renderGame();
             }
         };
         gameTimer.start();
@@ -67,7 +77,7 @@ public abstract class GameScreen extends Canvas {
         
         if (e.getCode() == KeyCode.LEFT) leftPressed = true;
         if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
-        if (e.getCode() == KeyCode.SPACE) paused = !paused;
+
         
         // Xử lý phím khi game over
         if (e.getCode() == KeyCode.R) {
@@ -85,7 +95,4 @@ public abstract class GameScreen extends Canvas {
         if (e.getCode() == KeyCode.RIGHT) rightPressed = false;
     }
 
-    public boolean isPaused() {
-        return paused;
-    }
 }

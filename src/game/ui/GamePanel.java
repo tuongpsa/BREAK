@@ -1,6 +1,10 @@
 package game.ui;
 
+import game.audio.AudioManager;
+import game.core.ControlScheme;
 import game.core.Game;
+import game.core.GameSettings;
+import game.core.PauseManager;
 import game.objects.Ball;
 import game.objects.Brick;
 import game.objects.Paddle;
@@ -11,6 +15,8 @@ import game.score.HighScoreManager;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -25,7 +31,6 @@ public class GamePanel extends GameScreen {
     private HighScoreManager highScoreManager;
     private GameOverRenderer gameOverRenderer;
     private MenuCallback menuCallback;
-
     private boolean highScoreProcessed = false;
 
     private Image ballImage;
@@ -35,11 +40,18 @@ public class GamePanel extends GameScreen {
     private Background background;
     private LevelRender levelRender;
     private int lastLevel = -1;
+    private final GameSettings gameSettings;
 
-    public GamePanel(double width, double height) {
-        super(width, height);
+    public GamePanel(double width, double height, GameSettings settings, AudioManager audioMgr, PauseManager pauseMgr) {
+        // 1. Truyền audioManager và pauseManager lên LỚP CHA (GameScreen)
+        super(width, height, audioMgr, pauseMgr);
 
-        game = new Game(audioManager);
+        // 2. Lưu lại GameSettings
+        this.gameSettings = settings;
+        // (this.audioManager và this.pauseManager đã được lớp cha lưu)
+
+        // 3. Truyền audioManager (đã được tiêm vào) cho Game
+        game = new Game(this.audioManager);
         highScoreManager = new HighScoreManager();
 
         levelRender = new LevelRender();
@@ -69,11 +81,13 @@ public class GamePanel extends GameScreen {
 
     @Override
     protected void updateGame(float deltaTime) {
-        if (paused) return;
-        
+        //if (paused) return;
+
         if (!game.isGameOver()) {
+            // Cập nhật input (logic này chạy đúng vì handleKeyPressed cập nhật left/rightPressed)
             if (leftPressed) game.getPaddle().moveLeft(deltaTime, game.getWidth());
             if (rightPressed) game.getPaddle().moveRight(deltaTime, game.getWidth());
+
             game.update(deltaTime);
         }
 
@@ -157,14 +171,7 @@ public class GamePanel extends GameScreen {
             gameOverRenderer.render(gc,getWidth(),getHeight(),game.getScore());
         }
 
-        // Vẽ paused overlay
-        if (paused) {
-            gc.setFill(Color.color(0,0,0,0.5));
-            gc.fillRect(0,0,getWidth(),getHeight());
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font(36));
-            gc.fillText("PAUSED",getWidth()/2 - 60,getHeight()/2);
-        }
+
     }
 
     // Xử lý high score
@@ -188,6 +195,37 @@ public class GamePanel extends GameScreen {
         this.menuCallback = callback;
     }
 
+    // Ghi đè (Override) hàm của GameScreen
+    @Override
+    protected void handleKeyPressed(KeyEvent e) {
+        // Phím ESC đã được xử lý bởi Main.java (trong setupInputHandlers)
+
+        // Nếu đang pause, không nhận phím game
+        if (pauseManager.isPaused()) return;
+
+        if (game.isGameOver()) {
+            if (e.getCode() == KeyCode.R) {
+                handleRestartKey();
+                return; // Đã xử lý, không làm gì nữa
+            }
+            if (e.getCode() == KeyCode.ESCAPE) {
+                handleQuitKey();
+                return; // Đã xử lý, không làm gì nữa
+            }
+        }
+
+        // Lấy kiểu điều khiển từ Settings
+        ControlScheme controls = gameSettings.getControlScheme();
+
+        if (controls == ControlScheme.ARROW_KEYS) {
+            if (e.getCode() == KeyCode.LEFT) leftPressed = true;
+            if (e.getCode() == KeyCode.RIGHT) rightPressed = true;
+        } else { // (controls == ControlScheme.AD_KEYS)
+            if (e.getCode() == KeyCode.A) leftPressed = true;
+            if (e.getCode() == KeyCode.D) rightPressed = true;
+        }
+    }
+
     @Override
     protected void handleRestartKey() {
         // Chỉ restart khi game over
@@ -206,6 +244,18 @@ public class GamePanel extends GameScreen {
             if (menuCallback != null) {
                 menuCallback.returnToMenu();
             }
+        }
+    }
+    @Override
+    protected void handleKeyReleased(KeyEvent e) {
+        ControlScheme controls = gameSettings.getControlScheme();
+
+        if (controls == ControlScheme.ARROW_KEYS) {
+            if (e.getCode() == KeyCode.LEFT) leftPressed = false;
+            if (e.getCode() == KeyCode.RIGHT) rightPressed = false;
+        } else { // (controls == ControlScheme.AD_KEYS)
+            if (e.getCode() == KeyCode.A) leftPressed = false;
+            if (e.getCode() == KeyCode.D) rightPressed = false;
         }
     }
 }
