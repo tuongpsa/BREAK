@@ -9,7 +9,6 @@ import game.objects.PowerUp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Handler;
 
 public class Game {
     private final float width = 480;

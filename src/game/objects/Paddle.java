@@ -20,8 +20,6 @@ public class Paddle extends GameObject {
     @Override
     public void update(float deltaTime) {
     }
-
-    // --- SỬA ĐỔI HÀM NÀY ---
     /**
      * Di chuyển thanh đỡ sang trái.
      * @param deltaTime Thời gian giữa 2 frame

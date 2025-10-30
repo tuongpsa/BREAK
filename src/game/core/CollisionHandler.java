@@ -74,7 +74,7 @@ public class CollisionHandler {
 
         // game.objects.Paddle
         if (ball.getY() + radius * 2 >= paddle.getY() &&
-                ball.getY() + radius <= paddle.getY() + paddle.getHeight() &&
+                ball.getY() + radius<= paddle.getY() + paddle.getHeight()  &&
                 ball.getX() + radius * 2 >= paddle.getX() &&
                 ball.getX() <= paddle.getX() + paddle.getWidth()) {
 
@@ -190,12 +190,12 @@ public class CollisionHandler {
     private void handlePowerUpCollision(List<PowerUp> powerUps, Paddle paddle, Game game) {
         for (int i = powerUps.size() - 1; i >= 0; i--) {
             PowerUp powerUp = powerUps.get(i);
-            
+
             // Kiểm tra va chạm với paddle
             if (powerUp.getY() + powerUp.getHeight() >= paddle.getY() &&
-                powerUp.getY() <= paddle.getY() + paddle.getHeight() &&
-                powerUp.getX() + powerUp.getWidth() >= paddle.getX() &&
-                powerUp.getX() <= paddle.getX() + paddle.getWidth()) {
+                    powerUp.getY() <= paddle.getY() + paddle.getHeight() &&
+                    powerUp.getX() + powerUp.getWidth() >= paddle.getX() &&
+                    powerUp.getX() <= paddle.getX() + paddle.getWidth()) {
                 System.out.println("Power-up " + powerUp.getType() + " đã được kích hoạt!");
                 
                 // Kích hoạt power-up

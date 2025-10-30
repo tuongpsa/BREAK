@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ebd94be-9e6a-4cc4-95ec-5a85fbc752f2" name="Changes" comment="" />
+    <list default="true" id="63b246ff-e9bc-434b-809f-4e698205e952" name="Changes" comment="extend gameobj">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/lib.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BREAK.iml" beforeDir="false" afterPath="$PROJECT_DIR$/BREAK.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/highscores.dat" beforeDir="false" afterPath="$PROJECT_DIR$/highscores.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/core/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/core/Game.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/objects/Paddle.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/objects/Paddle.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/ui/GamePanel.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/ui/GamePanel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/core/CollisionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/core/CollisionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/core/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/core/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/objects/Paddle.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/objects/Paddle.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game/ui/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/ui/GamePanel.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,6 +37,21 @@
     <analyzeAfterCompile>true</analyzeAfterCompile>
     <toolWindowToFront>false</toolWindowToFront>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "tuongpsa"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/tuongpsa/BREAK.git&quot;,
+    &quot;accountId&quot;: &quot;700a9c97-f759-4cb8-930c-b18ecacfd049&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 4
@@ -39,27 +67,29 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/PC/Downloads/BREAK&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/PC/Downloads/BREAK",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
-    <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-    </configuration>
     <configuration name="Main" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="game.main.Main" />
       <module name="BREAK" />
-      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\PC\OneDrive\Java\javafx-sdk-25\lib&quot; --add-modules javafx.controls,javafx.fxml,javafx.media --enable-native-access=javafx.graphics --add-exports=javafx.base/com.sun.javafx=ALL-UNNAMED --add-exports=javafx.media/com.sun.media.jfxmedia=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.glass.utils=ALL-UNNAMED " />
+      <option name="VM_PARAMETERS" value="--module-path &quot;D:\openjfx-25_windows-x64_bin-sdk\javafx-sdk-25\lib&quot; --add-modules javafx.controls,javafx.fxml,javafx.media --enable-native-access=javafx.graphics --add-exports=javafx.base/com.sun.javafx=ALL-UNNAMED --add-exports=javafx.media/com.sun.media.jfxmedia=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.glass.utils=ALL-UNNAMED" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -77,10 +107,26 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="TestNG">
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="6ebd94be-9e6a-4cc4-95ec-5a85fbc752f2" name="Changes" comment="" />
+      <changelist id="63b246ff-e9bc-434b-809f-4e698205e952" name="Changes" comment="extend gameobj" />
       <created>1761537891456</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />

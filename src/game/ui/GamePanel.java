@@ -40,11 +40,11 @@ public class GamePanel extends GameScreen {
         levelRender = new LevelRender();
         game.getLevelManager().setLevelRender(levelRender);
 
-        ballImage = new Image("file:assets/bóng.png");
-        paddleImage = new Image("file:assets/haiz.png");
+        ballImage = new Image("file:assets/ball.png");
+        paddleImage = new Image("file:assets/paddle1.png");
         brickImage = new Image("file:assets/brick1.jpg");
 
-        background = new Background("assets/backgroundtest.jpeg");
+        background = new Background("assets/background.png");
 
         if (ballImage.isError() || paddleImage.isError() || brickImage.isError()) {
             System.out.println("Object game is error");
@@ -85,14 +85,14 @@ public class GamePanel extends GameScreen {
         gc.drawImage(
                 paddleImage,
                 paddleCenterX - paddle.getWidth()/2,
-                paddleCenterY - paddle.getHeight()/2,
+                paddleCenterY - paddle.getHeight()/2-90,
                 paddle.getWidth(),
-                paddle.getHeight()*5.5
+                paddle.getHeight()*30
         );
 
         // Vẽ bóng
         for (Ball ball : game.getBalls()) {
-            gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius()*2, ball.getRadius()*2);
+            gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius()*2+10, ball.getRadius()*2+10);
         }
 
         // Vẽ gạch
