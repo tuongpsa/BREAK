@@ -16,10 +16,10 @@ public class Game {
 
     private List<Ball> balls = new ArrayList<>();
     private final float ballRadius = 15;
-    private final float ballSpeed = 250.f;
+    private final float ballSpeed = 500.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width/4 ;
+    private final float paddleWidth = width ;
     private final float paddleHeight = 7;
 
     private List<Brick> bricks = new ArrayList<>();

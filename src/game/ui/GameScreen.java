@@ -5,7 +5,6 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
 /**
  * Lớp cơ sở cho mọi màn hình game.
  */

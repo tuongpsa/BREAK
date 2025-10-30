@@ -1,16 +1,21 @@
 package game.ui;
-import game.render.LevelRender;
 
 import game.core.Game;
-import game.objects.*;
+import game.objects.Ball;
+import game.objects.Brick;
+import game.objects.Paddle;
 import game.render.Background;
 import game.render.GameOverRenderer;
+import game.render.LevelRender;
 import game.score.HighScoreManager;
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Màn hình chơi game chính.
@@ -25,7 +30,7 @@ public class GamePanel extends GameScreen {
 
     private Image ballImage;
     private Image paddleImage;
-    private Image brickImage;
+    private Map<Integer, Image> brickImages;
 
     private Background background;
     private LevelRender levelRender;
@@ -42,13 +47,24 @@ public class GamePanel extends GameScreen {
 
         ballImage = new Image("file:assets/ball.png");
         paddleImage = new Image("file:assets/paddle1.png");
-        brickImage = new Image("file:assets/brick1.jpg");
+
+        brickImages = new HashMap<>();
+        Image brick_hp3 = new Image("file:assets/brick3.png"); // Gạch 3 HP
+        Image brick_hp2 = new Image("file:assets/brick2.png"); // Gạch 2 HP
+        Image brick_hp1 = new Image("file:assets/brick.png"); // Gạch 1 HP
+
+        // Đưa ảnh vào Map với "key" là số HP
+        brickImages.put(3, brick_hp3);
+        brickImages.put(2, brick_hp2);
+        brickImages.put(1, brick_hp1);
 
         background = new Background("assets/background.png");
 
-        if (ballImage.isError() || paddleImage.isError() || brickImage.isError()) {
-            System.out.println("Object game is error");
+        if (ballImage.isError() || paddleImage.isError() ||
+                brick_hp3.isError() || brick_hp2.isError() || brick_hp1.isError()) {
+            System.out.println("Lỗi: Không thể tải một hoặc nhiều file ảnh (ball, paddle, hoặc bricks).");
         }
+
     }
 
     @Override
@@ -96,9 +112,25 @@ public class GamePanel extends GameScreen {
         }
 
         // Vẽ gạch
+
         for (Brick brick : game.getBricks()) {
             if (!brick.isDestroyed()) {
-                gc.drawImage(brickImage, brick.getX(), brick.getY(), brick.getWidth(), brick.getHeight());
+
+                // Lấy HP hiện tại của gạch
+                int currentHp = brick.getHp();
+
+                //Lấy ảnh tương ứng từ Map
+                Image imageToDraw = brickImages.get(currentHp);
+
+                //Nếu không tìm thấy ảnh thì dùng ảnh HP thấp nhất
+                if (imageToDraw == null) {
+                    imageToDraw = brickImages.get(3); // Ảnh mặc định
+                }
+
+
+                if (imageToDraw != null) {
+                    gc.drawImage(imageToDraw, brick.getX(), brick.getY(), brick.getWidth()+10, brick.getHeight()+10);
+                }
             }
         }
 

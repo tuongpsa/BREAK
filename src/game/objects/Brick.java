@@ -41,4 +41,12 @@ public class Brick extends GameObject {
         return this.destroyed;
     }
 
+    /**
+     * Trả về số HP (máu) hiện tại của gạch.
+     * @return số HP hiện tại
+     */
+    public int getHp() {
+        return this.hp;
+    }
+
 }
