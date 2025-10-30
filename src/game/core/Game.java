@@ -19,7 +19,7 @@ public class Game {
     private final float ballSpeed = 500.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width ;
+    private final float paddleWidth = width/2 ;
     private final float paddleHeight = 7;
 
     private List<Brick> bricks = new ArrayList<>();

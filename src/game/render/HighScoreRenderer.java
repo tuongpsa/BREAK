@@ -1,6 +1,6 @@
 package game.render;
 
-import game.score.HighScoreManager;
+import game.score.HighScoreEntry;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class HighScoreRenderer {
     
-    public void render(GraphicsContext gc, double width, double height, List<HighScoreManager.HighScoreEntry> highScores) {
+    public void render(GraphicsContext gc, double width, double height, List<HighScoreEntry> highScores) {
         // Vẽ background gradient
         LinearGradient backgroundGradient = new LinearGradient(
             0, 0, 0, 1, true,
@@ -67,7 +67,7 @@ public class HighScoreRenderer {
         gc.fillText(instruction, width / 2, height - 40);
     }
     
-    private void drawLeaderboard(GraphicsContext gc, double width, double height, List<HighScoreManager.HighScoreEntry> highScores) {
+    private void drawLeaderboard(GraphicsContext gc, double width, double height, List<HighScoreEntry> highScores) {
         double startY = 150;
         double rowHeight = 60;
         double tableWidth = width - 80;
@@ -101,8 +101,7 @@ public class HighScoreRenderer {
             gc.fillText("No scores yet. Play the game to set a record!", width / 2, startY + 50);
         } else {
             for (int i = 0; i < highScores.size(); i++) {
-                HighScoreManager.HighScoreEntry entry = highScores.get(i);
-                double y = startY + i * rowHeight;
+                HighScoreEntry entry = highScores.get(i);                double y = startY + i * rowHeight;
                 
                 // Màu sắc khác nhau cho top 3
                 Color rankColor;
