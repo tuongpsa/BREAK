@@ -6,17 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="63b246ff-e9bc-434b-809f-4e698205e952" name="Changes" comment="thay ảnh">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/brick1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/highscores.dat" beforeDir="false" afterPath="$PROJECT_DIR$/highscores.dat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/core/Game.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/core/Game.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/objects/Brick.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/objects/Brick.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/ui/GamePanel.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/ui/GamePanel.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/ui/GameScreen$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/ui/GameScreen$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/BREAK/game/ui/GameScreen.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/BREAK/game/ui/GameScreen.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/core/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/core/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/objects/Brick.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/objects/Brick.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/ui/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/ui/GamePanel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/game/ui/GameScreen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/game/ui/GameScreen.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
