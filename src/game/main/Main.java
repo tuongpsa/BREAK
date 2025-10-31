@@ -63,7 +63,7 @@ public class Main extends Application {
                 gameSettings,
                 audioManager,
                 () -> gamePanel.getGame().resetGame(), // Hàm Restart
-                this::switchToMenu                      // Hàm Exit (quay về Menu)
+                this::switchToMenuFromPause                      // Hàm Exit (quay về Menu từ Pause)
         );
 
         // 3. Dùng StackPane để xếp chồng PauseMenu LÊN TRÊN GamePanel
@@ -135,6 +135,9 @@ public class Main extends Application {
                     // Chuyển sang high score
                     switchToHighScore();
                     this.stop();
+                } else if (menuPanel.isContinueGame()) {
+                    switchToGameContinue();
+                    this.stop();
                 } else if (menuPanel.isQuitGame()) {
                     // Thoát game
                     primaryStage.close();
@@ -154,6 +157,8 @@ public class Main extends Application {
         // GamePanel đã được khởi tạo 1 lần (và duy nhất) trong hàm start().
         // Chúng ta chỉ cần reset game.
         gamePanel.getGame().resetGame();
+        // Bắt đầu game mới: ẩn continue trong phiên
+        game.core.SaveManager.clearSessionSave();
 
         primaryStage.setScene(gameScene);
         gamePanel.setMenuCallback(this::switchToMenu);
@@ -163,6 +168,27 @@ public class Main extends Application {
         // Gắn input (phím ESC) cho GameScene
         setupGameInput(gameScene);
 
+        startGameOverLoop();
+    }
+
+    private void switchToGameContinue() {
+        // Dừng nhạc menu
+        if (menuPanel != null) {
+            menuPanel.stopMenuMusic();
+            menuPanel.resetContinueGame();
+        }
+
+        primaryStage.setScene(gameScene);
+        gamePanel.setMenuCallback(this::switchToMenu);
+        gamePanel.startGameLoop();
+        gamePanel.requestFocus();
+
+        // Load save
+        game.core.SaveManager.load(gamePanel.getGame());
+        // Đã dùng continue: ẩn lại cho đến khi save mới
+        game.core.SaveManager.clearSessionSave();
+
+        setupGameInput(gameScene);
         startGameOverLoop();
     }
     
@@ -185,16 +211,42 @@ public class Main extends Application {
         if (gamePanel != null) {
             gamePanel.stopGameLoop();
         }
-        
+
+        // Nếu quay về từ game over, không cho Continue
+        if (gamePanel != null && gamePanel.getGame().isGameOver()) {
+            game.core.SaveManager.clearSessionSave();
+        }
         primaryStage.setScene(menuScene);
         menuPanel.resetStartGame();
+        menuPanel.resetContinueGame();
         menuPanel.resetQuitGame();
         menuPanel.resetShowHighScore();
         menuPanel.requestFocus();
         
         // Bắt đầu lại nhạc menu
-// <<< SỬA LỖI 3: Khởi động lại nhạc menu
-        // Dùng AudioManager trung tâm
+        if (audioManager != null) {
+            audioManager.playMenuMusic();
+        }
+
+        startMenuLoop();
+    }
+
+    private void switchToMenuFromPause() {
+        // Dừng game loop cũ nếu có
+        if (gamePanel != null) {
+            gamePanel.stopGameLoop();
+        }
+        // Lưu khi thoát ra menu từ Pause → cho phép Continue trong phiên
+        if (gamePanel != null) {
+            game.core.SaveManager.save(gamePanel.getGame());
+        }
+        primaryStage.setScene(menuScene);
+        menuPanel.resetStartGame();
+        menuPanel.resetContinueGame();
+        menuPanel.resetQuitGame();
+        menuPanel.resetShowHighScore();
+        menuPanel.requestFocus();
+
         if (audioManager != null) {
             audioManager.playMenuMusic();
         }

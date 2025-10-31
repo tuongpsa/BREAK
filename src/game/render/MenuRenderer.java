@@ -50,8 +50,16 @@ public class MenuRenderer {
         gc.setFill(titleColor);
         gc.fillText(title, width / 2, height / 2 - 100);
         
-        // Vẽ nút Start
-        drawButton(gc, width, height, "START GAME", height / 2 - 40, 200, 50);
+        // Vẽ nút Continue (chỉ khi có save trong phiên hiện tại)
+        boolean hasSave = game.core.SaveManager.hasSessionSave();
+        if (hasSave) {
+            drawButton(gc, width, height, "CONTINUE", height / 2 - 100, 200, 50);
+            // Vẽ nút Start ngay bên dưới
+            drawButton(gc, width, height, "START GAME", height / 2 - 40, 200, 50);
+        } else {
+            // Không có save: chỉ vẽ Start ở vị trí mặc định
+            drawButton(gc, width, height, "START GAME", height / 2 - 40, 200, 50);
+        }
         
         // Vẽ nút High Score
         drawButton(gc, width, height, "HIGH SCORE", height / 2 + 20, 200, 50);
@@ -60,7 +68,7 @@ public class MenuRenderer {
         drawButton(gc, width, height, "QUIT", height / 2 + 80, 150, 40);
         
         // Vẽ hướng dẫn
-        String instruction = "Click START GAME to begin";
+        String instruction = hasSave ? "Click CONTINUE or START" : "Click START GAME to begin";
         Font instructionFont = Font.loadFont("file:assets/VSWISEC.ttf", 16);
         gc.setFont(instructionFont);
         gc.setFill(Color.LIGHTGRAY);

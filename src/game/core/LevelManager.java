@@ -60,6 +60,10 @@ public class LevelManager {
         return level;
     }
 
+    public void setLevel(int level) {
+        this.level = Math.max(1, level);
+    }
+
     public void setLevelRender(LevelRender levelRender) {
         this.levelRender = levelRender;
     }

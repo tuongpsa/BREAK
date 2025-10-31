@@ -18,6 +18,7 @@ public class MenuPanel extends Canvas {
     private boolean quitGame = false;
     private boolean showHighScore = false;
     private boolean resumeGame = false; // Cho pause menu
+    private boolean continueGame = false; // Continue from save
 
     public MenuPanel(double width, double height, AudioManager audioManager) {
         super(width, height);
@@ -72,6 +73,10 @@ public class MenuPanel extends Canvas {
         else if (isPointInQuitButton(x, y)) {
             quitGame = true;
         }
+        // Kiểm tra click vào nút Continue (nếu có file save)
+        else if (isPointInContinueButton(x, y) && game.core.SaveManager.hasSessionSave()) {
+            continueGame = true;
+        }
     }
 
     private void handleMouseMove(double x, double y) {
@@ -79,10 +84,11 @@ public class MenuPanel extends Canvas {
     }
 
     private boolean isPointInStartButton(double x, double y) {
+        boolean hasSave = game.core.SaveManager.hasSessionSave();
         double buttonWidth = 200;
         double buttonHeight = 50;
         double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getHeight() / 2 - 40;
+        double buttonY = hasSave ? getHeight() / 2 - 40 : getHeight() / 2 - 40;
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                y >= buttonY && y <= buttonY + buttonHeight;
@@ -113,6 +119,17 @@ public class MenuPanel extends Canvas {
         double buttonHeight = 40;
         double buttonX = (getWidth() - buttonWidth) / 2;
         double buttonY = getHeight() / 2 + 80;
+
+        return x >= buttonX && x <= buttonX + buttonWidth &&
+               y >= buttonY && y <= buttonY + buttonHeight;
+    }
+
+    private boolean isPointInContinueButton(double x, double y) {
+        if (!game.core.SaveManager.hasSessionSave()) return false;
+        double buttonWidth = 200;
+        double buttonHeight = 50;
+        double buttonX = (getWidth() - buttonWidth) / 2;
+        double buttonY = getHeight() / 2 - 100;
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                y >= buttonY && y <= buttonY + buttonHeight;
@@ -149,6 +166,8 @@ public class MenuPanel extends Canvas {
         return resumeGame;
     }
 
+    public boolean isContinueGame() { return continueGame; }
+
     public void resetStartGame() {
         startGame = false;
     }
@@ -164,6 +183,8 @@ public class MenuPanel extends Canvas {
     public void resetResumeGame() {
         resumeGame = false;
     }
+
+    public void resetContinueGame() { continueGame = false; }
 
     public void stopMenuMusic() {
         if (audioManager != null) {

@@ -49,4 +49,9 @@ public class Brick extends GameObject {
         return this.hp;
     }
 
+    public void setHp(int hp) {
+        this.hp = Math.max(0, hp);
+        this.destroyed = this.hp <= 0;
+    }
+
 }

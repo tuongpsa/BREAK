@@ -1,0 +1,16 @@
+level=1
+score=160
+paddleX=196.81427
+paddleW=240.0
+shieldLives=0
+laserShots=6
+ballX=70.355156
+ballY=315.72662
+ballVX=328.75012
+ballVY=-380.03073
+bricksCount=5
+313.0,50.0,1
+360.0,50.0,1
+125.0,75.0,2
+313.0,75.0,1
+360.0,75.0,1
