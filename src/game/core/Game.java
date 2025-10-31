@@ -2,12 +2,16 @@ package game.core;
 
 import game.audio.AudioManager;
 import game.objects.Ball;
+import game.objects.Bullet;
 import game.objects.Brick;
 import game.objects.Paddle;
 import game.objects.PowerUp;
+import game.objects.PowerUpType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class Game {
@@ -26,9 +30,20 @@ public class Game {
     private int maxBrick = 5;
 
     private List<PowerUp> powerUps = new ArrayList<>();
+    private List<Bullet> bullets = new ArrayList<>();
+    private Map<PowerUpType, Float> activePowerUps = new HashMap<>(); // Track active power-ups và thời gian còn lại
     private int score = 0;
     private boolean gameOver = false;
     private int scoreMultiplier = 1;
+    // Power-up state
+    private boolean speedBoostActive = false;
+    private float speedBoostMultiplier = 1.5f;
+    private boolean bigPaddleActive = false;
+    private float bigPaddleMultiplier = 1.5f;
+    private boolean slowBallActive = false;
+    private float slowBallMultiplier = 0.7f;
+    private int shieldLives = 0;
+    private int laserShots = 0;
 
     private Random rand = new Random();
     private AudioManager audioManager;
@@ -103,14 +118,97 @@ public class Game {
             ball.update(deltaTime);
         }
 
-        // Update power-ups
+        // Update power-ups đang rơi
         for (int i = powerUps.size() - 1; i >= 0; i--) {
             PowerUp powerUp = powerUps.get(i);
             powerUp.update(deltaTime);
 
-            // Remove power-ups that fell off screen or expired
-            if (powerUp.getY() > height || powerUp.isExpired()) {
+            // Chỉ loại bỏ khi rơi khỏi màn hình; không dùng isExpired cho vật phẩm đang rơi
+            if (powerUp.getY() > height) {
                 powerUps.remove(i);
+            }
+        }
+
+        // Update bullets
+        for (int i = bullets.size() - 1; i >= 0; i--) {
+            Bullet bullet = bullets.get(i);
+            bullet.update(deltaTime);
+            if (bullet.getY() + bullet.getHeight() < 0) {
+                bullets.remove(i);
+                continue;
+            }
+            // Va chạm với gạch
+            for (int j = bricks.size() - 1; j >= 0; j--) {
+                Brick brick = bricks.get(j);
+                if (!brick.isDestroyed()) {
+                    java.awt.Rectangle b1 = new java.awt.Rectangle((int)brick.getX(), (int)brick.getY(), (int)brick.getWidth(), (int)brick.getHeight());
+                    java.awt.Rectangle b2 = bullet.getBounds();
+                    if (b1.intersects(b2)) {
+                        brick.hit();
+                        bullets.remove(i);
+                        if (brick.isDestroyed()) {
+                            addScore(10);
+                            // Có 20% cơ hội rơi power-up khi phá gạch bằng laser
+                            if (Math.random() < 0.2) {
+                                powerUps.add(new PowerUp(brick.getX(), brick.getY(), randomPowerUpType()));
+                            }
+                            bricks.remove(j);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Sau khi xử lý đạn, nếu hết gạch thì chuyển level
+        if (bricks.isEmpty() && !gameOver) {
+            levelManager.levelUp(this);
+        }
+        
+        // Update thời gian của các power-up đang active
+        List<PowerUpType> toRemove = new ArrayList<>();
+        for (Map.Entry<PowerUpType, Float> entry : activePowerUps.entrySet()) {
+            float timeLeft = entry.getValue();
+            timeLeft -= deltaTime;
+            if (timeLeft <= 0) {
+                toRemove.add(entry.getKey());
+            } else {
+                entry.setValue(timeLeft);
+            }
+        }
+        for (PowerUpType type : toRemove) {
+            activePowerUps.remove(type);
+            // Remove effect khi hết thời gian
+            if (type == PowerUpType.SCORE_MULTIPLIER) {
+                scoreMultiplier = 1;
+            } else if (type == PowerUpType.SPEED_BOOST) {
+                if (speedBoostActive) {
+                    Paddle p = getPaddle();
+                    if (p != null) {
+                        p.setMoveSpeed(p.getMoveSpeed() / speedBoostMultiplier);
+                    }
+                    speedBoostActive = false;
+                }
+            } else if (type == PowerUpType.BIG_PADDLE) {
+                if (bigPaddleActive) {
+                    Paddle p = getPaddle();
+                    if (p != null) {
+                        p.setWidth(p.getWidth() / bigPaddleMultiplier);
+                        if (p.getX() + p.getWidth() > getWidth()) {
+                            p.setX(getWidth() - p.getWidth());
+                        }
+                        if (p.getX() < 0) p.setX(0);
+                    }
+                    bigPaddleActive = false;
+                }
+            } else if (type == PowerUpType.SLOW_BALL) {
+                if (slowBallActive) {
+                    for (Ball b : balls) {
+                        b.setVelX(b.getVelX() / slowBallMultiplier);
+                        b.setVelY(b.getVelY() / slowBallMultiplier);
+                    }
+                    slowBallActive = false;
+                }
             }
         }
 
@@ -149,6 +247,7 @@ public class Game {
         balls.add(new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         powerUps.clear();
+        activePowerUps.clear(); // Xóa active power-ups khi reset
         createBricks(levelManager.getLevel());
     }
 
@@ -161,6 +260,23 @@ public class Game {
     public float getBallSpeed() { return ballSpeed; }
     public LevelManager getLevelManager() {
         return this.levelManager;
+    }
+
+    // Power-up methods
+    public boolean consumeShieldIfAvailable(Ball ball, float screenHeight) {
+        if (shieldLives > 0 && ball != null) {
+            shieldLives--;
+            // Đặt bóng lên trên mép dưới một chút và bật ngược lên
+            ball.setY(screenHeight - 40);
+            float vy = ball.getVelY();
+            if (vy > 0) {
+                ball.setVelY(-vy);
+            } else if (vy == 0) {
+                ball.setVelY(-Math.abs(getBallSpeed()));
+            }
+            return true;
+        }
+        return false;
     }
 
     // Power-up methods
@@ -196,5 +312,149 @@ public class Game {
 
     public float getBallRadius() {
         return ballRadius;
+    }
+    
+    // Method để random loại power-up
+    public PowerUpType randomPowerUpType() {
+        PowerUpType[] types = PowerUpType.values();
+        return types[rand.nextInt(types.length)];
+    }
+    
+    // Method tổng hợp để kích hoạt power-up dựa trên type
+    public void activatePowerUp(PowerUpType type) {
+        // Lấy duration từ PowerUpType (tạm thời hardcode, có thể lưu trong PowerUp object)
+        float duration = 10f;
+        switch (type) {
+            case SCORE_MULTIPLIER: duration = 15f; break;
+            case MULTI_BALL: duration = 0f; break; // Instant
+            case SPEED_BOOST: duration = 12f; break;
+            case BIG_PADDLE: duration = 15f; break;
+            case SLOW_BALL: duration = 10f; break;
+            case SHIELD: duration = 0f; break; // Instant
+            case LASER: duration = 0f; break; // Instant
+        }
+        
+        // Nếu power-up có duration, thêm vào activePowerUps
+        if (duration > 0) {
+            activePowerUps.put(type, duration);
+        }
+        
+        switch (type) {
+            case SCORE_MULTIPLIER:
+                activateScoreMultiplier();
+                break;
+            case MULTI_BALL:
+                activateMultiBall();
+                break;
+            case SPEED_BOOST:
+                activateSpeedBoost();
+                break;
+            case BIG_PADDLE:
+                activateBigPaddle();
+                break;
+            case SLOW_BALL:
+                activateSlowBall();
+                break;
+            case SHIELD:
+                activateShield();
+                break;
+            case LASER:
+                activateLaser();
+                break;
+        }
+    }
+    
+    // Các method kích hoạt cho power-up mới
+    public void activateSpeedBoost() {
+        if (speedBoostActive) return;
+        speedBoostActive = true;
+        Paddle p = getPaddle();
+        if (p != null) {
+            p.setMoveSpeed(p.getMoveSpeed() * speedBoostMultiplier);
+        }
+    }
+    
+    public void activateBigPaddle() {
+        if (bigPaddleActive) return;
+        bigPaddleActive = true;
+        Paddle p = getPaddle();
+        if (p != null) {
+            float newWidth = p.getWidth() * bigPaddleMultiplier;
+            float overflow = (p.getX() + newWidth) - getWidth();
+            p.setWidth(newWidth);
+            if (overflow > 0) {
+                p.setX(Math.max(0, p.getX() - overflow));
+            }
+        }
+    }
+    
+    public void activateSlowBall() {
+        if (slowBallActive) return;
+        slowBallActive = true;
+        for (Ball b : balls) {
+            b.setVelX(b.getVelX() * slowBallMultiplier);
+            b.setVelY(b.getVelY() * slowBallMultiplier);
+        }
+    }
+    
+    public void activateShield() {
+        shieldLives += 1;
+    }
+    
+    public void activateLaser() {
+        laserShots += 6; // cấp số lần bắn
+    }
+    
+    // Getter cho active power-ups
+    public Map<PowerUpType, Float> getActivePowerUps() {
+        return activePowerUps;
+    }
+
+    // Laser API
+    public void fireLaser() {
+        if (laserShots <= 0) return;
+        Paddle p = getPaddle();
+        if (p == null) return;
+        float bulletWidth = 6;
+        float bulletHeight = 16;
+        float speed = 800f;
+        float leftX = p.getX() + p.getWidth() * 0.25f - bulletWidth / 2f;
+        float rightX = p.getX() + p.getWidth() * 0.75f - bulletWidth / 2f;
+        float y = p.getY() - bulletHeight - 5;
+        bullets.add(new Bullet(leftX, y, bulletWidth, bulletHeight, speed));
+        bullets.add(new Bullet(rightX, y, bulletWidth, bulletHeight, speed));
+        laserShots--;
+    }
+
+    public List<Bullet> getBullets() { return bullets; }
+    public int getLaserShots() { return laserShots; }
+
+    public int getShieldLives() { return shieldLives; }
+
+    // Reset all power-up effects when changing level
+    public void clearPowerUpsOnLevelUp() {
+        // Clear active timers
+        activePowerUps.clear();
+        // Reset score multiplier
+        scoreMultiplier = 1;
+        // Reset paddle speed
+        if (paddle != null) {
+            paddle.setMoveSpeed(350f);
+            // Reset paddle width to default
+            paddle.setWidth(paddleWidth);
+            if (paddle.getX() + paddle.getWidth() > width) {
+                paddle.setX(width - paddle.getWidth());
+            }
+            if (paddle.getX() < 0) paddle.setX(0);
+        }
+        speedBoostActive = false;
+        bigPaddleActive = false;
+        slowBallActive = false;
+        // Clear shield and laser
+        shieldLives = 0;
+        laserShots = 0;
+        // Remove bullets and falling powerups
+        bullets.clear();
+        powerUps.clear();
     }
 }

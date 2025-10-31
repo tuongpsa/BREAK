@@ -5,7 +5,7 @@ package game.objects;
  */
 public class Paddle extends GameObject {
 
-    private static final float MOVE_SPEED = 350f;
+    private float moveSpeed = 350f;
 
     /**
      * Constructor cho Paddle.
@@ -27,7 +27,7 @@ public class Paddle extends GameObject {
      */
     public void moveLeft(float deltaTime, float gameWidth) {
         // di chuyển sang trái
-        this.x -= MOVE_SPEED * deltaTime;
+        this.x -= moveSpeed * deltaTime;
 
         // Kiểm tra va chạm với tường bên trái
         if (this.x < 0) {
@@ -42,11 +42,19 @@ public class Paddle extends GameObject {
      */
     public void moveRight(float deltaTime, float gameWidth) {
         // di chuyển sang phải
-        this.x += MOVE_SPEED * deltaTime;
+        this.x += moveSpeed * deltaTime;
 
         // Kiểm tra va chạm với tường bên phải
         if (this.x + this.width > gameWidth) {
             this.x = gameWidth - this.width;
         }
+    }
+
+    public float getMoveSpeed() {
+        return this.moveSpeed;
+    }
+
+    public void setMoveSpeed(float moveSpeed) {
+        this.moveSpeed = moveSpeed;
     }
 }

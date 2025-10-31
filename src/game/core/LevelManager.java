@@ -16,6 +16,9 @@ public class LevelManager {
             levelRender.showLevel(level);
         }
 
+        // Xóa mọi hiệu ứng power-up đang active trước khi chuyển level
+        game.clearPowerUpsOnLevelUp();
+
         // Reset lại vị trí ball và paddle
         game.getBall().setX((game.getWidth() / 2) - game.getBall().getRadius());
         game.getBall().setY(game.getHeight() - 30);
@@ -26,8 +29,7 @@ public class LevelManager {
 
 
 
-        // xóa power-ups hiện có
-        game.getPowerUps().clear();
+        // (đã clear trong clearPowerUpsOnLevelUp)
 
 
         // Tăng số lượng gạch

@@ -8,6 +8,9 @@ import game.core.PauseManager;
 import game.objects.Ball;
 import game.objects.Brick;
 import game.objects.Paddle;
+import game.objects.PowerUp;
+import game.objects.PowerUpType;
+import game.objects.Bullet;
 import game.render.Background;
 import game.render.GameOverRenderer;
 import game.render.LevelRender;
@@ -35,7 +38,9 @@ public class GamePanel extends GameScreen {
 
     private Image ballImage;
     private Image paddleImage;
+    private Image ballShieldImage;
     private Map<Integer, Image> brickImages;
+    private Map<PowerUpType, Image> powerUpImages;
 
     private Background background;
     private LevelRender levelRender;
@@ -58,6 +63,7 @@ public class GamePanel extends GameScreen {
         game.getLevelManager().setLevelRender(levelRender);
 
         ballImage = new Image("file:assets/ball.png");
+        ballShieldImage = new Image("file:assets/shield_active.png");
         paddleImage = new Image("file:assets/paddle1.png");
 
         brickImages = new HashMap<>();
@@ -71,6 +77,20 @@ public class GamePanel extends GameScreen {
         brickImages.put(1, brick_hp1);
 
         background = new Background("assets/background.png");
+
+        // Power-up images (dùng ảnh sẵn có trong assets làm placeholder)
+        powerUpImages = new HashMap<>();
+        try {
+            powerUpImages.put(PowerUpType.SCORE_MULTIPLIER, new Image("file:assets/SCORE_MULTIPLIER.png"));
+            powerUpImages.put(PowerUpType.MULTI_BALL, new Image("file:assets/MULTI_BALL.png"));
+            powerUpImages.put(PowerUpType.SPEED_BOOST, new Image("file:assets/SPEED_BOOST.png"));
+            powerUpImages.put(PowerUpType.BIG_PADDLE, new Image("file:assets/BIG_PADDLE.png"));
+            powerUpImages.put(PowerUpType.SLOW_BALL, new Image("file:assets/SLOW_BALL.png"));
+            powerUpImages.put(PowerUpType.SHIELD, new Image("file:assets/SHIELD.png"));
+            powerUpImages.put(PowerUpType.LASER, new Image("file:assets/LASER.png"));
+        } catch (Exception e) {
+            System.out.println("Lỗi tải ảnh power-up: " + e.getMessage());
+        }
 
         if (ballImage.isError() || paddleImage.isError() ||
                 brick_hp3.isError() || brick_hp2.isError() || brick_hp1.isError()) {
@@ -122,7 +142,25 @@ public class GamePanel extends GameScreen {
 
         // Vẽ bóng
         for (Ball ball : game.getBalls()) {
-            gc.drawImage(ballImage, ball.getX(), ball.getY(), ball.getRadius()*2+10, ball.getRadius()*2+10);
+            double w = ball.getRadius()*2+10;
+            double h = w;
+            boolean shieldActive = game.getShieldLives() > 0;
+            if (shieldActive && ballShieldImage != null && !ballShieldImage.isError()) {
+                gc.drawImage(ballShieldImage, ball.getX(), ball.getY(), w, h);
+            } else {
+                gc.drawImage(ballImage, ball.getX(), ball.getY(), w, h);
+            }
+        }
+
+        // Vẽ đạn laser
+        gc.setFill(Color.RED);
+        for (Bullet b : game.getBullets()) {
+            gc.fillRect(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+        }
+
+        // Vẽ power-ups đang rơi
+        for (PowerUp powerUp : game.getPowerUps()) {
+            renderPowerUp(gc, powerUp);
         }
 
         // Vẽ gạch
@@ -153,6 +191,9 @@ public class GamePanel extends GameScreen {
         gc.setFont(Font.font(18));
         gc.fillText("Score: " + game.getScore(),10,40);
         gc.fillText("Level: " + game.getLevelManager().getLevel(),10,20);
+        
+        // Vẽ thời gian còn lại của các power-up đang active
+        renderActivePowerUps(gc, game);
 
         levelRender.render(gc);
 
@@ -224,6 +265,11 @@ public class GamePanel extends GameScreen {
             if (e.getCode() == KeyCode.A) leftPressed = true;
             if (e.getCode() == KeyCode.D) rightPressed = true;
         }
+
+        // Bắn laser
+        if (e.getCode() == KeyCode.SPACE) {
+            game.fireLaser();
+        }
     }
 
     @Override
@@ -256,6 +302,103 @@ public class GamePanel extends GameScreen {
         } else { // (controls == ControlScheme.AD_KEYS)
             if (e.getCode() == KeyCode.A) leftPressed = false;
             if (e.getCode() == KeyCode.D) rightPressed = false;
+        }
+    }
+    
+    private void renderPowerUp(GraphicsContext gc, PowerUp powerUp) {
+        float x = powerUp.getX();
+        float y = powerUp.getY();
+        float width = powerUp.getWidth();
+        float height = powerUp.getHeight();
+        Image img = powerUpImages != null ? powerUpImages.get(powerUp.getType()) : null;
+        if (img != null && !img.isError()) {
+            gc.drawImage(img, x, y, width, height);
+        } else {
+            // Fallback vẽ hình nếu ảnh không có
+            Color color = getPowerUpColor(powerUp.getType());
+            switch (powerUp.getType()) {
+                case SCORE_MULTIPLIER:
+                case MULTI_BALL:
+                case SHIELD:
+                case LASER:
+                    gc.setFill(color);
+                    gc.fillOval(x, y, width, height);
+                    gc.setStroke(Color.WHITE);
+                    gc.setLineWidth(2);
+                    gc.strokeOval(x, y, width, height);
+                    break;
+                case SPEED_BOOST:
+                case BIG_PADDLE:
+                case SLOW_BALL:
+                    gc.setFill(color);
+                    gc.fillRect(x, y, width, height);
+                    gc.setStroke(Color.WHITE);
+                    gc.setLineWidth(2);
+                    gc.strokeRect(x, y, width, height);
+                    break;
+            }
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font(12));
+            String symbol = getPowerUpSymbol(powerUp.getType());
+            gc.fillText(symbol, x + width/2 - 5, y + height/2 + 5);
+        }
+    }
+    
+    private Color getPowerUpColor(PowerUpType type) {
+        switch (type) {
+            case SCORE_MULTIPLIER: return Color.GOLD;
+            case MULTI_BALL: return Color.CYAN;
+            case SPEED_BOOST: return Color.LIME;
+            case BIG_PADDLE: return Color.ORANGE;
+            case SLOW_BALL: return Color.PURPLE;
+            case SHIELD: return Color.BLUE;
+            case LASER: return Color.RED;
+            default: return Color.GRAY;
+        }
+    }
+    
+    private String getPowerUpSymbol(PowerUpType type) {
+        switch (type) {
+            case SCORE_MULTIPLIER: return "x2";
+            case MULTI_BALL: return "MB";
+            case SPEED_BOOST: return "S";
+            case BIG_PADDLE: return "B";
+            case SLOW_BALL: return "SL";
+            case SHIELD: return "S";
+            case LASER: return "L";
+            default: return "?";
+        }
+    }
+    
+    private void renderActivePowerUps(GraphicsContext gc, Game game) {
+        Map<PowerUpType, Float> activePowerUps = game.getActivePowerUps();
+        if (activePowerUps == null || activePowerUps.isEmpty()) return;
+        gc.setFill(Color.YELLOW);
+        gc.setFont(Font.font(14));
+        float yOffset = 60;
+        int index = 0;
+        for (Map.Entry<PowerUpType, Float> entry : activePowerUps.entrySet()) {
+            PowerUpType type = entry.getKey();
+            Float timeLeft = entry.getValue();
+            if (timeLeft != null && timeLeft > 0) {
+                String typeName = getPowerUpName(type);
+                String timeText = String.format("%s: %.1fs", typeName, timeLeft);
+                gc.fillText(timeText, 10, yOffset + index * 20);
+                index++;
+            }
+        }
+    }
+    
+    private String getPowerUpName(PowerUpType type) {
+        switch (type) {
+            case SCORE_MULTIPLIER: return "Score x2";
+            case MULTI_BALL: return "Multi Ball";
+            case SPEED_BOOST: return "Speed Boost";
+            case BIG_PADDLE: return "Big Paddle";
+            case SLOW_BALL: return "Slow Ball";
+            case SHIELD: return "Shield";
+            case LASER: return "Laser";
+            default: return "Unknown";
         }
     }
 }

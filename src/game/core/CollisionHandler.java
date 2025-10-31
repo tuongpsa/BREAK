@@ -31,6 +31,10 @@ public class CollisionHandler {
             
             // Kiểm tra game over - chỉ khi tất cả balls đều rơi
             if (ball.getY() >= screenHeight) {
+                // Nếu có khiên, cứu bóng và bật ngược lại
+                if (game.consumeShieldIfAvailable(ball, screenHeight)) {
+                    continue;
+                }
                 balls.remove(ballIndex);
                 if (balls.isEmpty()) {
                     game.setGameOver(true);
@@ -41,6 +45,8 @@ public class CollisionHandler {
         // Xử lý va chạm power-up với paddle
         handlePowerUpCollision(powerUps, paddle, game);
     }
+
+    
     
     private void handleSingleBallCollision(Ball ball, float deltaTime, List<Brick> bricks, Game game, Paddle paddle, List<PowerUp> powerUps, float screenWidth, float screenHeight) {
         float dx = ball.getVelX() * deltaTime;
@@ -74,7 +80,7 @@ public class CollisionHandler {
 
         // game.objects.Paddle
         if (ball.getY() + radius * 2 >= paddle.getY() &&
-                ball.getY() + radius<= paddle.getY() + paddle.getHeight()  &&
+                ball.getY() + radius <= paddle.getY() + paddle.getHeight() &&
                 ball.getX() + radius * 2 >= paddle.getX() &&
                 ball.getX() <= paddle.getX() + paddle.getWidth()) {
 
@@ -155,8 +161,8 @@ public class CollisionHandler {
                         if (brick.isDestroyed()) {
                             game.addScore(10);
                             // Có 20% chance drop power-up
-                            if (Math.random() < 1.0) {
-                                dropPowerUp(brick.getX(), brick.getY(), powerUps);
+                            if (Math.random() < 1) {
+                                dropPowerUp(brick.getX(), brick.getY(), powerUps, game);
                             }
 
 
@@ -182,31 +188,24 @@ public class CollisionHandler {
         }
     }
     
-    private void dropPowerUp(float x, float y, List<PowerUp> powerUps) {
-        PowerUpType type = Math.random() < 0.5 ? PowerUpType.SCORE_MULTIPLIER : PowerUpType.MULTI_BALL;
+    private void dropPowerUp(float x, float y, List<PowerUp> powerUps, Game game) {
+        PowerUpType type = game.randomPowerUpType();
         powerUps.add(new PowerUp(x, y, type));
     }
     
     private void handlePowerUpCollision(List<PowerUp> powerUps, Paddle paddle, Game game) {
         for (int i = powerUps.size() - 1; i >= 0; i--) {
             PowerUp powerUp = powerUps.get(i);
-
+            
             // Kiểm tra va chạm với paddle
             if (powerUp.getY() + powerUp.getHeight() >= paddle.getY() &&
-                    powerUp.getY() <= paddle.getY() + paddle.getHeight() &&
-                    powerUp.getX() + powerUp.getWidth() >= paddle.getX() &&
-                    powerUp.getX() <= paddle.getX() + paddle.getWidth()) {
+                powerUp.getY() <= paddle.getY() + paddle.getHeight() &&
+                powerUp.getX() + powerUp.getWidth() >= paddle.getX() &&
+                powerUp.getX() <= paddle.getX() + paddle.getWidth()) {
                 System.out.println("Power-up " + powerUp.getType() + " đã được kích hoạt!");
                 
-                // Kích hoạt power-up
-                switch (powerUp.getType()) {
-                    case PowerUpType.SCORE_MULTIPLIER:
-                        game.activateScoreMultiplier();
-                        break;
-                    case PowerUpType.MULTI_BALL:
-                        game.activateMultiBall();
-                        break;
-                }
+                // Kích hoạt power-up: chỉ gọi 1 hàm, không viết logic ở đây
+                game.activatePowerUp(powerUp.getType());
                 
                 powerUps.remove(i);
             }
