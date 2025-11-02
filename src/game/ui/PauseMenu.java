@@ -1,134 +1,288 @@
-package game.ui; // Bạn có thể đặt tên package là game.core nếu muốn
+package game.ui;
 
 import game.audio.AudioManager;
 import game.core.ControlScheme;
 import game.core.GameSettings;
 import game.core.PauseManager;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 /**
- * Lớp này quản lý toàn bộ giao diện (UI) của menu pause.
- * Nó chứa 2 "màn hình": menu chính và menu cài đặt.
+ * Lớp PauseMenu được thiết kế lại hoàn toàn
+ * để sử dụng tài sản (assets) hình ảnh tùy chỉnh theo mockup.
+ * Đã cập nhật để chứa 4 nút và co giãn khung nền.
  */
 public class PauseMenu {
 
-    // --- Các thành phần UI chính ---
-    private final StackPane rootPane;       // Lớp nền đen mờ
-    private final VBox mainPausePane;       // Hộp chứa menu "Tạm dừng"
-    private final VBox settingsPane;        // Hộp chứa menu "Cài đặt"
+    // --- Đường dẫn tới thư mục assets ---
+    // !!! QUAN TRỌNG: Kiểm tra lại đường dẫn này !!!
+    // (Dựa trên tin nhắn trước, tôi dùng đường dẫn này)
+    private final String ASSET_PATH = "assets/gui/gui/WindowPopUp/";
 
-    // --- Tham chiếu đến các hệ thống khác ---
+    // --- Các thành phần UI ---
+    private final StackPane rootPane;       // Lớp nền đen mờ
+    private final StackPane mainPausePane;  // Pane chứa menu "Tạm dừng"
+    private final StackPane settingsPane;   // Pane chứa menu "Cài đặt"
+
+    // --- Các ảnh đã load ---
+    private final Image frameImage;       // W-4.png (Khung chính)
+    private final Image buttonImage;      // choose.png (Nút bấm)
+    private final Image buttonClickImage; // choose(click).png (Nút bấm khi nhấn)
+    private final Image crownImage;       // G-2.jpg (Vương miện)
+    private final Image closeImage;       // 2-2.png (Nút X)
+
+    // --- Tham chiếu hệ thống ---
     private final PauseManager pauseManager;
-    private final GameSettings gameSettings;
-    private final AudioManager audioManager;
 
     /**
-     * Tạo giao diện menu pause.
-     * @param pauseManager     Để điều khiển pause/resume.
-     * @param gameSettings     Để đọc/ghi cài đặt.
-     * @param audioManager     Để áp dụng cài đặt âm thanh.
-     * @param onRestart        Hàm (Runnable) được gọi khi bấm "Restart".
-     * @param onExit           Hàm (Runnable) được gọi khi bấm "Exit" (về Menu chính).
+     * Tạo giao diện menu pause ĐẸP
      */
     public PauseMenu(PauseManager pauseManager, GameSettings gameSettings, AudioManager audioManager, Runnable onRestart, Runnable onExit) {
         this.pauseManager = pauseManager;
-        this.gameSettings = gameSettings;
-        this.audioManager = audioManager;
 
-        // === 1. Lớp Nền (Root) ===
-        // StackPane để xếp chồng các menu lên nhau
+        // === 1. LOAD HÌNH ẢNH ===
+        frameImage = loadImage("W-4.png");
+        buttonImage = loadImage("choose.png");
+        buttonClickImage = loadImage("choose(click).png");
+        crownImage = loadImage("G-2.png");
+        closeImage = loadImage("2-2.png");
+
+        // === 2. LỚP NỀN (ROOT) ===
         rootPane = new StackPane();
-        // CSS để làm nền đen mờ 60%
-        rootPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);");
+        rootPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.6);"); // Nền mờ
         rootPane.setAlignment(Pos.CENTER);
         rootPane.setVisible(false); // Ẩn lúc đầu
 
-        // === 2. Pane 1: Menu Pause Chính ===
-        mainPausePane = createMenuVBox(); // Dùng hàm helper
+        // === 3. XÂY DỰNG PANE 1: MENU PAUSE CHÍNH ===
+        mainPausePane = buildMainPausePane(onRestart, onExit);
 
-        Label title = createLabel("TẠM DỪNG", 40);
+        // === 4. XÂY DỰNG PANE 2: MENU CÀI ĐẶT ===
+        settingsPane = buildSettingsPane(gameSettings, audioManager);
 
-        Button resumeButton = createMenuButton("TIẾP TỤC");
-        Button restartButton = createMenuButton("CHƠI LẠI");
-        Button settingsButton = createMenuButton("CÀI ĐẶT");
-        Button exitButton = createMenuButton("VỀ MENU CHÍNH");
+        // Thêm cả 2 pane vào root (pane chính ở trên)
+        rootPane.getChildren().addAll(settingsPane, mainPausePane);
+    }
 
-        // Gán hành động cho các nút
-        resumeButton.setOnAction(e -> pauseManager.resume());
+    /**
+     * Xây dựng giao diện cho Menu Pause chính (Đủ 4 nút)
+     */
+    private StackPane buildMainPausePane(Runnable onRestart, Runnable onExit) {
+        // 1. Khung nền (W-4.png)
+        ImageView frameView = new ImageView(frameImage);
+        // Đặt chiều cao cố định để đủ chứa 4 nút
+        frameView.setFitHeight(650);
+        frameView.setPreserveRatio(true);
 
-        restartButton.setOnAction(e -> {
-            pauseManager.resume(); // Quan trọng: Luôn resume trước khi làm việc khác
+        // 2. Tiêu đề (Vương miện + Chữ "PAUSED")
+        ImageView crownView = new ImageView(crownImage);
+        crownView.setFitWidth(250);
+        crownView.setPreserveRatio(true);
+
+        Label titleLabel = createLabel("PAUSED", 36, "#FFFFFF");
+        StackPane titlePane = new StackPane(crownView, titleLabel);
+        titlePane.setAlignment(Pos.CENTER);
+        StackPane.setMargin(titleLabel, new Insets(0, 0, 20, 0));
+
+        // 3. Tạo 4 nút bấm
+        StackPane resumeButton = createStyledButton("TIẾP TỤC");
+        StackPane restartButton = createStyledButton("CHƠI LẠI");
+        StackPane settingsButton = createStyledButton("CÀI ĐẶT");
+        StackPane exitButton = createStyledButton("MENU CHÍNH");
+
+        // Gán hành động cho 4 nút
+        resumeButton.setOnMouseClicked(e -> pauseManager.resume());
+        restartButton.setOnMouseClicked(e -> {
+            pauseManager.resume();
             onRestart.run();
         });
-
-        exitButton.setOnAction(e -> {
-            pauseManager.resume(); // Quan trọng: Luôn resume
+        settingsButton.setOnMouseClicked(e -> showSettingsPane(true)); // <<< ĐÃ SỬA LỖI
+        exitButton.setOnMouseClicked(e -> {
+            pauseManager.resume();
             onExit.run();
         });
 
-        settingsButton.setOnAction(e -> showSettingsPane(true)); // Chuyển sang menu Cài đặt
+        // 4. Nút 'X' (Đóng)
+        ImageView closeButton = createClickableIcon(closeImage, 60);
+        closeButton.setOnMouseClicked(e -> pauseManager.resume());
 
-        mainPausePane.getChildren().addAll(title, resumeButton, restartButton, settingsButton, exitButton);
+        // 5. Container (VBox) trong suốt cho nội dung
+        // Giảm khoảng cách (spacing) xuống 8 để vừa 4 nút
+        VBox contentBox = new VBox(-50, titlePane, resumeButton, restartButton, settingsButton, exitButton);
+        contentBox.setAlignment(Pos.CENTER);
+        contentBox.setPadding(new Insets(-100, 0, 10, 0)); // Căn đều
 
-        // === 3. Pane 2: Menu Cài đặt ===
-        settingsPane = createMenuVBox();
-        settingsPane.setVisible(false); // Ẩn lúc đầu
+        // 6. Xếp chồng mọi thứ
+        StackPane pane = new StackPane(frameView, contentBox, closeButton);
+        StackPane.setAlignment(closeButton, Pos.TOP_RIGHT);
+        // Chỉnh lại vị trí nút X cho khớp với khung 550px
+        StackPane.setMargin(closeButton, new Insets(40, 45, 0, 0));
 
-        Label settingsTitle = createLabel("CÀI ĐẶT", 30);
-        settingsTitle.setAlignment(Pos.CENTER);
-        settingsTitle.setMaxWidth(Double.MAX_VALUE);
+        return pane;
+    }
 
-        // --- Thanh trượt âm lượng nhạc ---
-        Label musicLabel = createLabel("Âm lượng Nhạc:", 18);
-        Slider musicSlider = new Slider(0, 1, gameSettings.getMusicVolume()); // Min=0, Max=1, Default=giá trị hiện tại
-        // Thêm listener: Khi kéo thanh trượt...
-        musicSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            // ...gọi AudioManager, nó sẽ tự cập nhật GameSettings
-            audioManager.setMusicVolume(newVal.doubleValue());
-        });
+    /**
+     * Xây dựng giao diện cho Menu Cài đặt
+     */
+    private StackPane buildSettingsPane(GameSettings gameSettings, AudioManager audioManager) {
+        // 1. Khung nền (dùng chung W-4.png, cùng kích thước)
+        ImageView frameView = new ImageView(frameImage);
+        frameView.setFitHeight(550); // <<< CÙNG KÍCH THƯỚC
+        frameView.setPreserveRatio(true);
 
-        // --- Thanh trượt âm lượng hiệu ứng (SFX) ---
-        Label sfxLabel = createLabel("Âm lượng Hiệu ứng:", 18);
-        Slider sfxSlider = new Slider(0, 1, gameSettings.getSfxVolume());
-        sfxSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            audioManager.setSoundEffectsVolume(newVal.doubleValue());
-        });
+        // 2. Tiêu đề (dùng vương miện)
+        ImageView crownView = new ImageView(crownImage);
+        crownView.setFitWidth(250);
+        crownView.setPreserveRatio(true);
+        Label titleLabel = createLabel("CÀI ĐẶT", 36, "#FFFFFF");
+        StackPane titlePane = new StackPane(crownView, titleLabel);
+        titlePane.setAlignment(Pos.CENTER);
+        StackPane.setMargin(titleLabel, new Insets(0, 0, 10, 0));
 
-        // --- Chọn kiểu điều khiển ---
-        Label controlLabel = createLabel("Điều khiển:", 18);
-        ChoiceBox<ControlScheme> controlChoice = new ChoiceBox<>();
-        controlChoice.getItems().addAll(ControlScheme.ARROW_KEYS, ControlScheme.AD_KEYS);
-        controlChoice.setValue(gameSettings.getControlScheme()); // Đặt giá trị mặc định
-        controlChoice.setMaxWidth(Double.MAX_VALUE);
-        // Khi người chơi chọn...
-        controlChoice.valueProperty().addListener((obs, oldVal, newVal) -> {
-            gameSettings.setControlScheme(newVal); // ...lưu cài đặt
-        });
+        // 3. Các controls
+        Label musicLabel = createLabel("Âm lượng Nhạc:", 18, "#FFFFFF");
+        Slider musicSlider = createStyledSlider(gameSettings.getMusicVolume());
+        musicSlider.valueProperty().addListener((obs, o, n) -> audioManager.setMusicVolume(n.doubleValue()));
 
-        Button backButton = createMenuButton("QUAY LẠI");
-        backButton.setOnAction(e -> showSettingsPane(false)); // Quay về menu chính
+        Label sfxLabel = createLabel("Âm lượng Hiệu ứng:", 18, "#FFFFFF");
+        Slider sfxSlider = createStyledSlider(gameSettings.getSfxVolume());
+        sfxSlider.valueProperty().addListener((obs, o, n) -> audioManager.setSoundEffectsVolume(n.doubleValue()));
 
-        settingsPane.getChildren().addAll(
-                settingsTitle,
+        Label controlLabel = createLabel("Điều khiển:", 18, "#FFFFFF");
+        ChoiceBox<ControlScheme> controlChoice = createStyledChoiceBox(gameSettings.getControlScheme());
+        controlChoice.valueProperty().addListener((obs, o, n) -> gameSettings.setControlScheme(n));
+
+        // 4. Nút Quay lại
+        StackPane backButton = createStyledButton("QUAY LẠI");
+        backButton.setOnMouseClicked(e -> showSettingsPane(false));
+
+        // 5. Container (VBox) trong suốt
+        VBox contentBox = new VBox(8, // Giảm khoảng cách
+                titlePane,
                 musicLabel, musicSlider,
                 sfxLabel, sfxSlider,
                 controlLabel, controlChoice,
                 backButton
         );
+        contentBox.setAlignment(Pos.CENTER_LEFT);
+        contentBox.setPadding(new Insets(0, 40, 0, 40));
+        contentBox.setMaxWidth(350); // Giới hạn chiều rộng nội dung
 
-        // Thêm cả 2 pane vào root (thứ tự quan trọng, mainPausePane ở trên)
-        rootPane.getChildren().addAll(settingsPane, mainPausePane);
+        // 6. Xếp chồng
+        StackPane pane = new StackPane(frameView, contentBox);
+        pane.setVisible(false); // Ẩn lúc đầu
+        return pane;
     }
 
-    // === 4. Các hàm Helper (Trợ giúp) ===
+    // === CÁC HÀM HELPER (TRỢ GIÚP) ===
+
+    /**
+     * Helper để load ảnh từ thư mục assets
+     */
+    private Image loadImage(String fileName) {
+        String path = null;
+        try {
+            path = ASSET_PATH + fileName;
+            return new Image(new FileInputStream(path));
+        } catch (FileNotFoundException e) {
+            System.err.println("LỖI NGHIÊM TRỌNG: Không thể tìm thấy file ảnh: " + path);
+            throw new RuntimeException("Không thể load ảnh: " + fileName, e);
+        }
+    }
+
+    /**
+     * Helper tạo một "Nút bấm" bằng hình ảnh (choose.png)
+     */
+    private StackPane createStyledButton(String text) {
+        StackPane buttonPane = new StackPane();
+        buttonPane.setAlignment(Pos.CENTER);
+
+        ImageView buttonView = new ImageView(buttonImage);
+        buttonView.setFitWidth(200);
+        buttonView.setPreserveRatio(true);
+
+        ImageView buttonClickView = new ImageView(buttonClickImage);
+        buttonClickView.setFitWidth(200);
+        buttonClickView.setPreserveRatio(true);
+        buttonClickView.setVisible(false);
+
+        Label buttonText = createLabel(text, 24, "#FFFFFF");
+        buttonText.setTextAlignment(TextAlignment.CENTER);
+
+        buttonPane.getChildren().addAll(buttonView, buttonClickView, buttonText);
+        buttonPane.setPrefHeight(60);
+
+        // Hiệu ứng
+        buttonPane.setOnMousePressed(e -> buttonClickView.setVisible(true));
+        buttonPane.setOnMouseReleased(e -> buttonClickView.setVisible(false));
+        buttonPane.setOnMouseEntered(e -> buttonPane.setScaleX(1.05));
+        buttonPane.setOnMouseExited(e -> buttonPane.setScaleX(1.0));
+
+        return buttonPane;
+    }
+
+    /**
+     * Helper tạo một Icon (như nút X) có thể click
+     */
+    private ImageView createClickableIcon(Image iconImage, double size) {
+        ImageView iconView = new ImageView(iconImage);
+        iconView.setFitWidth(size);
+        iconView.setFitHeight(size);
+
+        iconView.setOnMousePressed(e -> iconView.setScaleX(0.9));
+        iconView.setOnMouseReleased(e -> iconView.setScaleX(1.0));
+        iconView.setOnMouseEntered(e -> iconView.setOpacity(0.8));
+        iconView.setOnMouseExited(e -> iconView.setOpacity(1.0));
+
+        return iconView;
+    }
+
+    /** Helper để tạo nhãn (Label) chuẩn */
+    private Label createLabel(String text, int fontSize, String color) {
+        Label label = new Label(text);
+        label.setFont(Font.font("Arial", FontWeight.BOLD, fontSize));
+        label.setTextFill(Color.web(color));
+        return label;
+    }
+
+    /** Helper tạo Slider (Thanh trượt) với style màu tím/xanh */
+    private Slider createStyledSlider(double defaultValue) {
+        Slider slider = new Slider(0, 1, defaultValue);
+        slider.setStyle(
+                "-fx-control-inner-background: #8A2BE2; " + // Tím
+                        "-fx-accent: #00FFEF;" // Xanh Cyan
+        );
+        return slider;
+    }
+
+    /** Helper tạo ChoiceBox (Hộp chọn) với style */
+    private ChoiceBox<ControlScheme> createStyledChoiceBox(ControlScheme defaultScheme) {
+        ChoiceBox<ControlScheme> choiceBox = new ChoiceBox<>();
+        choiceBox.getItems().addAll(ControlScheme.ARROW_KEYS, ControlScheme.AD_KEYS);
+        choiceBox.setValue(defaultScheme);
+        choiceBox.setMaxWidth(Double.MAX_VALUE);
+
+        choiceBox.setStyle(
+                "-fx-background-color: #8A2BE2; " + // Tím
+                        "-fx-mark-color: #00FFEF; " + // Xanh Cyan
+                        "-fx-text-fill: #FFFFFF;" + // Chữ trắng
+                        "-fx-font-weight: bold;"
+        );
+        return choiceBox;
+    }
 
     /** Chuyển đổi giữa menu chính và menu cài đặt */
     private void showSettingsPane(boolean show) {
@@ -136,55 +290,17 @@ public class PauseMenu {
         mainPausePane.setVisible(!show);
     }
 
-    /** Helper để tạo VBox menu chuẩn */
-    private VBox createMenuVBox() {
-        VBox vbox = new VBox(20); // Khoảng cách 20px
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setMaxWidth(300);
-        // CSS cho hộp menu
-        vbox.setStyle("-fx-background-color: #222; -fx-padding: 30; -fx-border-color: #CCC; -fx-border-width: 2;");
-        return vbox;
-    }
+    // === CÁC PHƯƠNG THỨC PUBLIC (cho MainGame gọi) ===
 
-    /** Helper để tạo nút bấm chuẩn */
-    private Button createMenuButton(String text) {
-        Button btn = new Button(text);
-        btn.setFont(new Font("Arial", 20));
-        btn.setMaxWidth(Double.MAX_VALUE); // Cho nút rộng tối đa
-        return btn;
-    }
-
-    /** Helper để tạo nhãn (Label) chuẩn */
-    private Label createLabel(String text, int fontSize) {
-        Label label = new Label(text);
-        label.setFont(new Font("Arial", fontSize));
-        label.setTextFill(Color.WHITE);
-        return label;
-    }
-
-    // === 5. Phương thức Public (cho class MainGame gọi) ===
-
-    /**
-     * Trả về Node UI (StackPane) để thêm vào Scene chính của game.
-     */
     public StackPane getRootNode() {
         return rootPane;
     }
 
-    /**
-     * Hiển thị menu pause.
-     * Được gọi bởi PauseListener.
-     */
     public void show() {
         rootPane.setVisible(true);
-        // Đảm bảo menu chính luôn hiển thị khi mở, chứ không phải menu setting
-        showSettingsPane(false);
+        showSettingsPane(false); // Luôn mở ở menu chính
     }
 
-    /**
-     * Ẩn menu pause.
-     * Được gọi bởi PauseListener.
-     */
     public void hide() {
         rootPane.setVisible(false);
     }
