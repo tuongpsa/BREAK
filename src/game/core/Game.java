@@ -27,7 +27,6 @@ public class Game {
     private final float paddleHeight = 7;
 
     private List<Brick> bricks = new ArrayList<>();
-    private int maxBrick = 5;
 
     private List<PowerUp> powerUps = new ArrayList<>();
     private List<Bullet> bullets = new ArrayList<>();
@@ -46,14 +45,12 @@ public class Game {
     private int laserShots = 0;
 
     private Random rand = new Random();
-    private AudioManager audioManager;
 
     private LevelManager levelManager = new LevelManager();
     private final CollisionHandler collisionHandler;
 
     public Game(AudioManager audioManager) {
         this.collisionHandler = new CollisionHandler(audioManager, this.levelManager);
-        this.audioManager = audioManager;
         balls.add(new Ball((width/2)-ballRadius, height-20, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks(levelManager.getLevel());
@@ -228,12 +225,6 @@ public class Game {
     public float getHeight(){ return height; }
     public int getScoreMultiplier(){ return scoreMultiplier; }
 
-    //setter cho maxBrick
-   /* public void setMaxBrick(int maxBrick) {
-        this.maxBrick = maxBrick;
-    }*/
-
-
     // game.core.Game over
     public boolean isGameOver(){ return gameOver; }
     public void setGameOver(boolean b){ gameOver = b; }
@@ -260,6 +251,11 @@ public class Game {
     public float getBallSpeed() { return ballSpeed; }
     public LevelManager getLevelManager() {
         return this.levelManager;
+    }
+    
+    // Getter cho CollisionHandler để có thể shutdown khi cần
+    public CollisionHandler getCollisionHandler() {
+        return this.collisionHandler;
     }
 
     // Power-up methods

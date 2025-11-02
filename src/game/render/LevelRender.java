@@ -6,7 +6,6 @@ import javafx.scene.text.Font;
 
 public class LevelRender extends BaseRenderer {
 
-    private int currentLevel = 1;
     private long startTime = 0; // thời điểm bắt đầu hiển thị
     private boolean showing = false;
     private final long displayDuration = 3000; // 3 giây
@@ -20,7 +19,6 @@ public class LevelRender extends BaseRenderer {
      * Bắt đầu hiển thị level mới
      */
     public void showLevel(int level) {
-        this.currentLevel = level;
         this.text = "Level " + level;
         this.showing = true;
         this.startTime = System.currentTimeMillis();

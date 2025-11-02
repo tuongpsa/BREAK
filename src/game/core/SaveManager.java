@@ -51,18 +51,18 @@ public class SaveManager {
         if (!f.exists()) return false;
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             int level = 1;
-            int score = 0;
             float paddleX = game.getPaddle().getX();
             float paddleW = game.getPaddle().getWidth();
             int shieldLives = 0;
             int laserShots = 0;
             Float ballX = null, ballY = null, ballVX = null, ballVY = null;
-            int bricksCount = 0;
 
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("level=")) level = Integer.parseInt(line.substring(6));
-                else if (line.startsWith("score=")) score = Integer.parseInt(line.substring(6));
+                else if (line.startsWith("score=")) {
+                    // Score read but not applied (no setScore method available)
+                }
                 else if (line.startsWith("paddleX=")) paddleX = Float.parseFloat(line.substring(8));
                 else if (line.startsWith("paddleW=")) paddleW = Float.parseFloat(line.substring(8));
                 else if (line.startsWith("shieldLives=")) shieldLives = Integer.parseInt(line.substring(12));
@@ -71,7 +71,9 @@ public class SaveManager {
                 else if (line.startsWith("ballY=")) ballY = Float.parseFloat(line.substring(6));
                 else if (line.startsWith("ballVX=")) ballVX = Float.parseFloat(line.substring(7));
                 else if (line.startsWith("ballVY=")) ballVY = Float.parseFloat(line.substring(7));
-                else if (line.startsWith("bricksCount=")) bricksCount = Integer.parseInt(line.substring(12));
+                else if (line.startsWith("bricksCount=")) {
+                    // BricksCount read but not used (bricks are parsed directly)
+                }
                 else if (line.contains(",")) {
                     // Brick line ignored in first pass; handled below
                 }
@@ -83,9 +85,7 @@ public class SaveManager {
 
             // Now second pass to set brick HPs in order
             try (BufferedReader br2 = new BufferedReader(new FileReader(f))) {
-                // Skip header lines until brick list
-                int toSkip = 7; // level, score, paddleX, paddleW, shieldLives, laserShots, ballX,ballY,ballVX,ballVY optional, bricksCount
-                // We will parse dynamically, not skip by count
+                // Parse dynamically, not skip by count
                 String ln;
                 List<Brick> bricks = game.getBricks();
                 int idx = 0;
