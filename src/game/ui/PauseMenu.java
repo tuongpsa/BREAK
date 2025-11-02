@@ -29,8 +29,6 @@ import java.io.FileNotFoundException;
 public class PauseMenu {
 
     // --- Đường dẫn tới thư mục assets ---
-    // !!! QUAN TRỌNG: Kiểm tra lại đường dẫn này !!!
-    // (Dựa trên tin nhắn trước, tôi dùng đường dẫn này)
     private final String ASSET_PATH = "assets/gui/gui/WindowPopUp/";
 
     // --- Các thành phần UI ---
@@ -89,13 +87,13 @@ public class PauseMenu {
 
         // 2. Tiêu đề (Vương miện + Chữ "PAUSED")
         ImageView crownView = new ImageView(crownImage);
-        crownView.setFitWidth(250);
+        crownView.setFitWidth(400);
         crownView.setPreserveRatio(true);
 
         Label titleLabel = createLabel("PAUSED", 36, "#FFFFFF");
         StackPane titlePane = new StackPane(crownView, titleLabel);
         titlePane.setAlignment(Pos.CENTER);
-        StackPane.setMargin(titleLabel, new Insets(0, 0, 20, 0));
+        StackPane.setMargin(titleLabel, new Insets(50, 0, 0, 0));
 
         // 3. Tạo 4 nút bấm
         StackPane resumeButton = createStyledButton("TIẾP TỤC");
@@ -120,10 +118,9 @@ public class PauseMenu {
         closeButton.setOnMouseClicked(e -> pauseManager.resume());
 
         // 5. Container (VBox) trong suốt cho nội dung
-        // Giảm khoảng cách (spacing) xuống 8 để vừa 4 nút
         VBox contentBox = new VBox(-50, titlePane, resumeButton, restartButton, settingsButton, exitButton);
         contentBox.setAlignment(Pos.CENTER);
-        contentBox.setPadding(new Insets(-100, 0, 10, 0)); // Căn đều
+        contentBox.setPadding(new Insets(-180, 0, 10, 0)); // Căn đều
 
         // 6. Xếp chồng mọi thứ
         StackPane pane = new StackPane(frameView, contentBox, closeButton);
@@ -140,17 +137,18 @@ public class PauseMenu {
     private StackPane buildSettingsPane(GameSettings gameSettings, AudioManager audioManager) {
         // 1. Khung nền (dùng chung W-4.png, cùng kích thước)
         ImageView frameView = new ImageView(frameImage);
-        frameView.setFitHeight(550); // <<< CÙNG KÍCH THƯỚC
+        frameView.setFitHeight(650); // <<< CÙNG KÍCH THƯỚC
         frameView.setPreserveRatio(true);
 
         // 2. Tiêu đề (dùng vương miện)
         ImageView crownView = new ImageView(crownImage);
-        crownView.setFitWidth(250);
+        crownView.setFitWidth(400);
         crownView.setPreserveRatio(true);
         Label titleLabel = createLabel("CÀI ĐẶT", 36, "#FFFFFF");
         StackPane titlePane = new StackPane(crownView, titleLabel);
         titlePane.setAlignment(Pos.CENTER);
-        StackPane.setMargin(titleLabel, new Insets(0, 0, 10, 0));
+        StackPane.setMargin(crownView, new Insets(-150, 0, 0, 0));
+        StackPane.setMargin(titleLabel, new Insets(-130, 0, 0, 0));
 
         // 3. Các controls
         Label musicLabel = createLabel("Âm lượng Nhạc:", 18, "#FFFFFF");
