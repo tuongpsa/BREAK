@@ -240,8 +240,48 @@ public class AudioManager {
         gameSettings.setSfxVolume(volume);
 
         // 2. Áp dụng cho các Clip (phức tạp hơn, cần dùng FloatControl)
-        // Tạm thời chúng ta sẽ bỏ qua bước 2, chỉ lưu cài đặt.
-        // Bạn có thể tìm hiểu "Java FloatControl.MASTER_GAIN" để triển khai sau
-        System.out.println("SFX Volume đã được lưu: " + volume + " (Logic áp dụng cho Clip chưa triển khai)");
+        setClipVolume(brickHitClip, volume);
+        setClipVolume(paddleHitClip, volume);
+        setClipVolume(gameOverClip, volume);
+
+        System.out.println("SFX Volume đã được lưu: " + volume);
+    }
+    /**
+     * Helper để đặt âm lượng cho một đối tượng Clip (WAV).
+     * @param clip Đối tượng Clip (hiệu ứng âm thanh).
+     * @param volume Âm lượng (từ 0.0 đến 1.0).
+     */
+    private void setClipVolume(Clip clip, double volume) {
+        if (clip == null) {
+            return;
+        }
+
+        // Đảm bảo âm lượng nằm trong khoảng [0.0, 1.0]
+        volume = Math.max(0.0, Math.min(1.0, volume));
+
+        try {
+            // Lấy bộ điều khiển Âm lượng (MASTER_GAIN)
+            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+
+            // Tính toán giá trị dB
+            // Chúng ta sẽ nội suy tuyến tính giá trị từ min đến max
+            float min = gainControl.getMinimum(); // Thường là -80.0
+            float max = gainControl.getMaximum(); // Thường là 6.02
+
+            // Nếu volume = 0, đặt giá trị nhỏ nhất (tắt tiếng)
+            if (volume == 0.0) {
+                gainControl.setValue(min);
+            } else {
+                // Công thức nội suy (Mapping 0.0-1.0 to min-max)
+                float dB = (float) (Math.log10(volume) * 20.0);
+
+                // Đảm bảo giá trị dB không vượt quá ngưỡng
+                gainControl.setValue(Math.max(min, Math.min(dB, max)));
+            }
+
+        } catch (Exception e) {
+            // Lỗi này xảy ra nếu hệ thống âm thanh không hỗ trợ MASTER_GAIN
+            System.out.println("Không thể đặt âm lượng cho Clip: " + e.getMessage());
+        }
     }
 }
