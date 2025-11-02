@@ -114,7 +114,7 @@ public class PauseMenu {
         });
 
         // 4. Nút 'X' (Đóng)
-        ImageView closeButton = createClickableIcon(closeImage, 60);
+        ImageView closeButton = createClickableIcon(closeImage, 120);
         closeButton.setOnMouseClicked(e -> pauseManager.resume());
 
         // 5. Container (VBox) trong suốt cho nội dung
@@ -126,7 +126,7 @@ public class PauseMenu {
         StackPane pane = new StackPane(frameView, contentBox, closeButton);
         StackPane.setAlignment(closeButton, Pos.TOP_RIGHT);
         // Chỉnh lại vị trí nút X cho khớp với khung 550px
-        StackPane.setMargin(closeButton, new Insets(40, 45, 0, 0));
+        StackPane.setMargin(closeButton, new Insets(70, 70, 0, 0));
 
         return pane;
     }
@@ -135,53 +135,67 @@ public class PauseMenu {
      * Xây dựng giao diện cho Menu Cài đặt
      */
     private StackPane buildSettingsPane(GameSettings gameSettings, AudioManager audioManager) {
-        // 1. Khung nền (dùng chung W-4.png, cùng kích thước)
+        // === 1. Khung nền ===
         ImageView frameView = new ImageView(frameImage);
-        frameView.setFitHeight(650); // <<< CÙNG KÍCH THƯỚC
+        frameView.setFitHeight(650);
         frameView.setPreserveRatio(true);
 
-        // 2. Tiêu đề (dùng vương miện)
+        // === 2. Tiêu đề (vương miện + chữ) ===
         ImageView crownView = new ImageView(crownImage);
         crownView.setFitWidth(400);
         crownView.setPreserveRatio(true);
+
         Label titleLabel = createLabel("CÀI ĐẶT", 36, "#FFFFFF");
         StackPane titlePane = new StackPane(crownView, titleLabel);
         titlePane.setAlignment(Pos.CENTER);
-        StackPane.setMargin(crownView, new Insets(-150, 0, 0, 0));
-        StackPane.setMargin(titleLabel, new Insets(-130, 0, 0, 0));
+        StackPane.setMargin(titleLabel, new Insets(50, 0, 0, 0)); // đẩy chữ xuống một chút
 
-        // 3. Các controls
-        Label musicLabel = createLabel("Âm lượng Nhạc:", 18, "#FFFFFF");
+        // === 3. Kích thước tiêu chuẩn cho control ===
+        final double controlWidth = 280.0; // vừa khít khung hơn
+        final double boxWidth = controlWidth + 100; // tổng vùng content
+
+        // === 4. Nhãn và thanh điều khiển ===
+        Label musicLabel = createLabel("Âm lượng Nhạc:", 16, "#FFFFFF");
         Slider musicSlider = createStyledSlider(gameSettings.getMusicVolume());
         musicSlider.valueProperty().addListener((obs, o, n) -> audioManager.setMusicVolume(n.doubleValue()));
+        musicSlider.setPrefWidth(controlWidth);
+        musicSlider.setMaxWidth(controlWidth);
 
-        Label sfxLabel = createLabel("Âm lượng Hiệu ứng:", 18, "#FFFFFF");
+        Label sfxLabel = createLabel("Âm lượng Hiệu ứng:", 16, "#FFFFFF");
         Slider sfxSlider = createStyledSlider(gameSettings.getSfxVolume());
         sfxSlider.valueProperty().addListener((obs, o, n) -> audioManager.setSoundEffectsVolume(n.doubleValue()));
+        sfxSlider.setPrefWidth(controlWidth);
+        sfxSlider.setMaxWidth(controlWidth);
 
-        Label controlLabel = createLabel("Điều khiển:", 18, "#FFFFFF");
+        Label controlLabel = createLabel("Điều khiển:", 16, "#FFFFFF");
         ChoiceBox<ControlScheme> controlChoice = createStyledChoiceBox(gameSettings.getControlScheme());
         controlChoice.valueProperty().addListener((obs, o, n) -> gameSettings.setControlScheme(n));
+        controlChoice.setPrefWidth(controlWidth);
+        controlChoice.setMaxWidth(controlWidth);
 
-        // 4. Nút Quay lại
+        // === 5. Nút quay lại ===
         StackPane backButton = createStyledButton("QUAY LẠI");
         backButton.setOnMouseClicked(e -> showSettingsPane(false));
 
-        // 5. Container (VBox) trong suốt
-        VBox contentBox = new VBox(8, // Giảm khoảng cách
+        // === 6. Bố cục chính ===
+        VBox contentBox = new VBox(
+                10, // khoảng cách giữa các dòng
                 titlePane,
                 musicLabel, musicSlider,
                 sfxLabel, sfxSlider,
                 controlLabel, controlChoice,
                 backButton
         );
-        contentBox.setAlignment(Pos.CENTER_LEFT);
-        contentBox.setPadding(new Insets(0, 40, 0, 40));
-        contentBox.setMaxWidth(350); // Giới hạn chiều rộng nội dung
 
-        // 6. Xếp chồng
+        contentBox.setAlignment(Pos.CENTER); // căn giữa toàn bộ
+        contentBox.setPadding(new Insets(-255, 0, 0, 0));
+        contentBox.setMaxWidth(boxWidth);
+
+        // === 7. Xếp chồng khung nền và nội dung ===
         StackPane pane = new StackPane(frameView, contentBox);
-        pane.setVisible(false); // Ẩn lúc đầu
+        pane.setAlignment(Pos.CENTER);
+        pane.setVisible(false); // ẩn lúc đầu
+
         return pane;
     }
 
