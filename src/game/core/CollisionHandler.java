@@ -4,18 +4,25 @@ import game.audio.AudioManager;
 import game.objects.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class CollisionHandler {
     private final AudioManager audioManager;
 
     //khai báo LevelManager
     private final LevelManager levelManager;
+    
+    // ExecutorService cho đa luồng xử lý va chạm
+    private final ExecutorService executorService;
 
     //Thêm LevelManager vào constructor
     public CollisionHandler(AudioManager audioManager, LevelManager levelManager) {
         this.audioManager = audioManager;
         this.levelManager = levelManager; // Lưu lại LevelManager được chia sẻ
+        // Tạo thread pool với số lượng thread = số CPU cores
+        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
 
@@ -24,21 +31,52 @@ public class CollisionHandler {
         float screenWidth = game.getWidth();
         float screenHeight = game.getHeight();
         
-        // Xử lý từng ball
-        for (int ballIndex = balls.size() - 1; ballIndex >= 0; ballIndex--) {
-            Ball ball = balls.get(ballIndex);
-            handleSingleBallCollision(ball, deltaTime, bricks, game, paddle, powerUps, screenWidth, screenHeight);
-            
-            // Kiểm tra game over - chỉ khi tất cả balls đều rơi
-            if (ball.getY() >= screenHeight) {
-                // Nếu có khiên, cứu bóng và bật ngược lại
-                if (game.consumeShieldIfAvailable(ball, screenHeight)) {
-                    continue;
-                }
-                balls.remove(ballIndex);
-                if (balls.isEmpty()) {
-                    game.setGameOver(true);
-                }
+        // Tạo danh sách để lưu các ball cần xóa
+        List<Ball> ballsToRemove = new CopyOnWriteArrayList<>();
+        
+        // Tạo danh sách Future để theo dõi các task đa luồng
+        List<Future<?>> futures = new ArrayList<>();
+        
+        // Xử lý từng ball song song bằng đa luồng
+        synchronized (balls) {
+            for (int ballIndex = balls.size() - 1; ballIndex >= 0; ballIndex--) {
+                Ball ball = balls.get(ballIndex);
+                
+                // Tạo task cho mỗi ball để xử lý song song
+                Future<?> future = executorService.submit(() -> {
+                    handleSingleBallCollision(ball, deltaTime, bricks, game, paddle, powerUps, screenWidth, screenHeight);
+                    
+                    // Kiểm tra game over - chỉ khi tất cả balls đều rơi
+                    synchronized (ball) {
+                        if (ball.getY() >= screenHeight) {
+                            // Nếu có khiên, cứu bóng và bật ngược lại
+                            synchronized (game) {
+                                if (game.consumeShieldIfAvailable(ball, screenHeight)) {
+                                    return;
+                                }
+                            }
+                            ballsToRemove.add(ball);
+                        }
+                    }
+                });
+                futures.add(future);
+            }
+        }
+        
+        // Đợi tất cả các thread hoàn thành
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        // Xóa các ball đã rơi (sau khi tất cả thread hoàn thành)
+        synchronized (balls) {
+            balls.removeAll(ballsToRemove);
+            if (balls.isEmpty() && !ballsToRemove.isEmpty()) {
+                game.setGameOver(true);
             }
         }
         
@@ -49,9 +87,13 @@ public class CollisionHandler {
     
     
     private void handleSingleBallCollision(Ball ball, float deltaTime, List<Brick> bricks, Game game, Paddle paddle, List<PowerUp> powerUps, float screenWidth, float screenHeight) {
-        float dx = ball.getVelX() * deltaTime;
-        float dy = ball.getVelY() * deltaTime;
-        float radius = ball.getRadius();
+        float dx, dy, radius;
+        // Đồng bộ hóa khi đọc thuộc tính của ball
+        synchronized (ball) {
+            dx = ball.getVelX() * deltaTime;
+            dy = ball.getVelY() * deltaTime;
+            radius = ball.getRadius();
+        }
 
         float stepSize = radius / 2.0f;
         int steps = (int) Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / stepSize);
@@ -61,126 +103,145 @@ public class CollisionHandler {
         float stepY = dy / steps;
 
         // Trái
-        if (ball.getX() <= 0) {
-            ball.setX(0);
-            ball.setVelX(-ball.getVelX());
+        synchronized (ball) {
+            if (ball.getX() <= 0) {
+                ball.setX(0);
+                ball.setVelX(-ball.getVelX());
+            }
+
+            // Phải
+            if (ball.getX() + radius * 2 >= screenWidth) {
+                ball.setX(screenWidth - radius * 2);
+                ball.setVelX(-ball.getVelX());
+            }
+
+            // Trên
+            if (ball.getY() <= 0) {
+                ball.setY(0);
+                ball.setVelY(-ball.getVelY());
+            }
         }
 
-        // Phải
-        if (ball.getX() + radius * 2 >= screenWidth) {
-            ball.setX(screenWidth - radius * 2);
-            ball.setVelX(-ball.getVelX());
-        }
+        // game.objects.Paddle - đồng bộ hóa paddle và ball
+        synchronized (paddle) {
+            synchronized (ball) {
+                if (ball.getY() + radius * 2 >= paddle.getY() &&
+                        ball.getY() + radius <= paddle.getY() + paddle.getHeight() &&
+                        ball.getX() + radius * 2 >= paddle.getX() &&
+                        ball.getX() <= paddle.getX() + paddle.getWidth()) {
 
-        // Trên
-        if (ball.getY() <= 0) {
-            ball.setY(0);
-            ball.setVelY(-ball.getVelY());
-        }
+                    if (ball.getVelY() > 0) {
+                        // 1. Lấy vị trí tâm bóng và tâm thanh đỡ
+                        float tamBongX = ball.getX() + ball.getRadius();
+                        float tamThanhDoX = paddle.getX() + paddle.getWidth() / 2;
 
-        // game.objects.Paddle
-        if (ball.getY() + radius * 2 >= paddle.getY() &&
-                ball.getY() + radius <= paddle.getY() + paddle.getHeight() &&
-                ball.getX() + radius * 2 >= paddle.getX() &&
-                ball.getX() <= paddle.getX() + paddle.getWidth()) {
+                        // 2. Tính vị trí va chạm tương đối
+                        // (Giá trị từ -1.0 (mép trái) đến +1.0 (mép phải))
+                        float viTriVaChamTuongDoiX = tamBongX - tamThanhDoX;
+                        float viTriVaChamChuanHoaX = viTriVaChamTuongDoiX / (paddle.getWidth() / 2);
 
-            if (ball.getVelY() > 0) {
-                // 1. Lấy vị trí tâm bóng và tâm thanh đỡ
-                float tamBongX = ball.getX() + ball.getRadius();
-                float tamThanhDoX = paddle.getX() + paddle.getWidth() / 2;
+                        // 3. Giới hạn giá trị, đề phòng bóng đập vào cạnh
+                        viTriVaChamChuanHoaX = Math.max(-1.0f, Math.min(1.0f, viTriVaChamChuanHoaX));
 
-                // 2. Tính vị trí va chạm tương đối
-                // (Giá trị từ -1.0 (mép trái) đến +1.0 (mép phải))
-                float viTriVaChamTuongDoiX = tamBongX - tamThanhDoX;
-                float viTriVaChamChuanHoaX = viTriVaChamTuongDoiX / (paddle.getWidth() / 2);
+                        // 4. Lấy TỔNG tốc độ hiện tại của bóng (để bảo toàn tốc độ)
+                        float tongTocDoHienTai = (float)Math.sqrt(ball.getVelX() * ball.getVelX() +
+                                ball.getVelY() * ball.getVelY());
 
-                // 3. Giới hạn giá trị, đề phòng bóng đập vào cạnh
-                viTriVaChamChuanHoaX = Math.max(-1.0f, Math.min(1.0f, viTriVaChamChuanHoaX));
+                        // 5. Tính góc nảy.
+                        // Chúng ta sẽ đổi giá trị -1.0 đến +1.0 thành một góc,
+                        // ví dụ: tối đa 75 độ (khoảng 1.3 radians)
+                        float gocNayToiDa = 1.3f; // 75 độ
+                        float gocNay = viTriVaChamChuanHoaX * gocNayToiDa;
 
-                // 4. Lấy TỔNG tốc độ hiện tại của bóng (để bảo toàn tốc độ)
-                float tongTocDoHienTai = (float)Math.sqrt(ball.getVelX() * ball.getVelX() +
-                        ball.getVelY() * ball.getVelY());
+                        // 6. Dùng lượng giác (Sin và Cos) để tính vanTocX và vanTocY mới
+                        float vanTocMoiX = tongTocDoHienTai * (float)Math.sin(gocNay);
 
-                // 5. Tính góc nảy.
-                // Chúng ta sẽ đổi giá trị -1.0 đến +1.0 thành một góc,
-                // ví dụ: tối đa 75 độ (khoảng 1.3 radians)
-                float gocNayToiDa = 1.3f; // 75 độ
-                float gocNay = viTriVaChamChuanHoaX * gocNayToiDa;
+                        // vanTocY phải là SỐ ÂM (để đi lên)
+                        float vanTocMoiY = -tongTocDoHienTai * (float)Math.cos(gocNay);
 
-                // 6. Dùng lượng giác (Sin và Cos) để tính vanTocX và vanTocY mới
-                float vanTocMoiX = tongTocDoHienTai * (float)Math.sin(gocNay);
-
-                // vanTocY phải là SỐ ÂM (để đi lên)
-                float vanTocMoiY = -tongTocDoHienTai * (float)Math.cos(gocNay);
-
-                // 7. Cập nhật vận tốc mới cho bóng
-                ball.setVelX(vanTocMoiX);
-                ball.setVelY(vanTocMoiY);
-                
-                if (audioManager != null) {
-                    audioManager.playPaddleHit();
+                        // 7. Cập nhật vận tốc mới cho bóng
+                        ball.setVelX(vanTocMoiX);
+                        ball.setVelY(vanTocMoiY);
+                        
+                        if (audioManager != null) {
+                            audioManager.playPaddleHit();
+                        }
+                    }
                 }
             }
         }
 
         for (int i = 0; i < steps; i++) {
-            float nextX = ball.getX() + stepX;
-            float nextY = ball.getY() + stepY;
+            float nextX, nextY;
+            synchronized (ball) {
+                nextX = ball.getX() + stepX;
+                nextY = ball.getY() + stepY;
+            }
 
             boolean collided = false;
 
-            for (int j = bricks.size() - 1; j >= 0; j--) {
-                Brick brick = bricks.get(j);
+            // Đồng bộ hóa khi truy cập danh sách bricks
+            synchronized (bricks) {
+                for (int j = bricks.size() - 1; j >= 0; j--) {
+                    Brick brick = bricks.get(j);
 
-                if (!brick.isDestroyed()) {
-                    Rectangle rect = brick.getBounds();
-                    boolean hitX = nextX + radius * 2 > rect.x && nextX < rect.x + rect.width;
-                    boolean hitY = nextY + radius * 2 > rect.y && nextY < rect.y + rect.height;
+                    if (!brick.isDestroyed()) {
+                        Rectangle rect = brick.getBounds();
+                        boolean hitX = nextX + radius * 2 > rect.x && nextX < rect.x + rect.width;
+                        boolean hitY = nextY + radius * 2 > rect.y && nextY < rect.y + rect.height;
 
-                    if (hitX && hitY) {
-                        brick.hit();
-                        
-                        if (audioManager != null) {
-                            audioManager.playBrickHit();
-                        }
-
-                        float overlapLeft   = Math.abs((nextX + radius * 2) - rect.x);
-                        float overlapRight  = Math.abs((rect.x + rect.width) - nextX);
-                        float overlapTop    = Math.abs((nextY + radius * 2) - rect.y);
-                        float overlapBottom = Math.abs((rect.y + rect.height) - nextY);
-
-                        float minHorizontal = Math.min(overlapLeft, overlapRight);
-                        float minVertical   = Math.min(overlapTop, overlapBottom);
-
-                        if (minVertical < minHorizontal) {
-                            ball.setVelY(-ball.getVelY());
-                        } else {
-                            ball.setVelX(-ball.getVelX());
-                        }
-
-                        if (brick.isDestroyed()) {
-                            game.addScore(10);
-                            // Có 20% chance drop power-up
-                            if (Math.random() < 1) {
-                                dropPowerUp(brick.getX(), brick.getY(), powerUps, game);
+                        if (hitX && hitY) {
+                            brick.hit();
+                            
+                            if (audioManager != null) {
+                                audioManager.playBrickHit();
                             }
 
+                            float overlapLeft   = Math.abs((nextX + radius * 2) - rect.x);
+                            float overlapRight  = Math.abs((rect.x + rect.width) - nextX);
+                            float overlapTop    = Math.abs((nextY + radius * 2) - rect.y);
+                            float overlapBottom = Math.abs((rect.y + rect.height) - nextY);
 
-                            bricks.remove(j); // 'j' là chỉ số từ vòng lặp ngược
+                            float minHorizontal = Math.min(overlapLeft, overlapRight);
+                            float minVertical   = Math.min(overlapTop, overlapBottom);
 
-                            // Kiểm tra xem đã hết gạch chưa
-                            if (bricks.isEmpty()) {
-                                // In ra để debug
-                                System.out.println("GẠCH CUỐI CÙNG ĐÃ BỊ PHÁ! GỌI LEVEL UP!");
-
-                                // Gọi hàm level up
-                                levelManager.levelUp(game);
+                            synchronized (ball) {
+                                if (minVertical < minHorizontal) {
+                                    ball.setVelY(-ball.getVelY());
+                                } else {
+                                    ball.setVelX(-ball.getVelX());
+                                }
                             }
 
-                        }
+                            if (brick.isDestroyed()) {
+                                synchronized (game) {
+                                    game.addScore(10);
+                                }
+                                // Có 20% chance drop power-up
+                                synchronized (powerUps) {
+                                    if (Math.random() < 1) {
+                                        dropPowerUp(brick.getX(), brick.getY(), powerUps, game);
+                                    }
+                                }
 
-                        collided = true;
-                        break;
+                                bricks.remove(j); // 'j' là chỉ số từ vòng lặp ngược
+
+                                // Kiểm tra xem đã hết gạch chưa
+                                if (bricks.isEmpty()) {
+                                    // In ra để debug
+                                    System.out.println("GẠCH CUỐI CÙNG ĐÃ BỊ PHÁ! GỌI LEVEL UP!");
+
+                                    // Gọi hàm level up - đồng bộ hóa để tránh gọi nhiều lần
+                                    synchronized (game) {
+                                        levelManager.levelUp(game);
+                                    }
+                                }
+
+                            }
+
+                            collided = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -209,6 +270,21 @@ public class CollisionHandler {
                 
                 powerUps.remove(i);
             }
+        }
+    }
+    
+    /**
+     * Đóng ExecutorService để giải phóng tài nguyên khi game kết thúc
+     */
+    public void shutdown() {
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
