@@ -26,7 +26,8 @@ public class Brick extends GameObject {
     }
 
     @Override
-    public void update(float deltaTime) {}
+    public void update(float deltaTime) {
+    }
 
     public void hit() {
         if (destroyed) return;
@@ -43,6 +44,7 @@ public class Brick extends GameObject {
 
     /**
      * Trả về số HP (máu) hiện tại của gạch.
+     *
      * @return số HP hiện tại
      */
     public int getHp() {
