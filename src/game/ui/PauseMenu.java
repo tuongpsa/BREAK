@@ -95,10 +95,10 @@ public class PauseMenu {
         StackPane.setMargin(titleLabel, new Insets(50, 0, 0, 0));
 
         // 3. Tạo 4 nút bấm
-        StackPane resumeButton = createStyledButton("TIẾP TỤC");
-        StackPane restartButton = createStyledButton("CHƠI LẠI");
-        StackPane settingsButton = createStyledButton("CÀI ĐẶT");
-        StackPane exitButton = createStyledButton("MENU CHÍNH");
+        StackPane resumeButton = createStyledButton("CONTINUE");
+        StackPane restartButton = createStyledButton("RESTART");
+        StackPane settingsButton = createStyledButton("SETTING");
+        StackPane exitButton = createStyledButton("MAIN MENU");
 
         // Gán hành động cho 4 nút
         resumeButton.setOnMouseClicked(e -> pauseManager.resume());
@@ -144,7 +144,7 @@ public class PauseMenu {
         crownView.setFitWidth(400);
         crownView.setPreserveRatio(true);
 
-        Label titleLabel = createLabel("CÀI ĐẶT", 36, "#FFFFFF");
+        Label titleLabel = createLabel("SETTING", 36, "#FFFFFF");
         StackPane titlePane = new StackPane(crownView, titleLabel);
         titlePane.setAlignment(Pos.CENTER);
         StackPane.setMargin(titleLabel, new Insets(50, 0, 0, 0)); // đẩy chữ xuống một chút
@@ -154,26 +154,26 @@ public class PauseMenu {
         final double boxWidth = controlWidth + 100; // tổng vùng content
 
         // === 4. Nhãn và thanh điều khiển ===
-        Label musicLabel = createLabel("Âm lượng Nhạc:", 16, "#FFFFFF");
+        Label musicLabel = createLabel("MUSIC VOLUME:", 16, "#FFFFFF");
         Slider musicSlider = createStyledSlider(gameSettings.getMusicVolume());
         musicSlider.valueProperty().addListener((obs, o, n) -> audioManager.setMusicVolume(n.doubleValue()));
         musicSlider.setPrefWidth(controlWidth);
         musicSlider.setMaxWidth(controlWidth);
 
-        Label sfxLabel = createLabel("Âm lượng Hiệu ứng:", 16, "#FFFFFF");
+        Label sfxLabel = createLabel("SFX VOLUME:", 16, "#FFFFFF");
         Slider sfxSlider = createStyledSlider(gameSettings.getSfxVolume());
         sfxSlider.valueProperty().addListener((obs, o, n) -> audioManager.setSoundEffectsVolume(n.doubleValue()));
         sfxSlider.setPrefWidth(controlWidth);
         sfxSlider.setMaxWidth(controlWidth);
 
-        Label controlLabel = createLabel("Điều khiển:", 16, "#FFFFFF");
+        Label controlLabel = createLabel("CONTROL:", 16, "#FFFFFF");
         ChoiceBox<ControlScheme> controlChoice = createStyledChoiceBox(gameSettings.getControlScheme());
         controlChoice.valueProperty().addListener((obs, o, n) -> gameSettings.setControlScheme(n));
         controlChoice.setPrefWidth(controlWidth);
         controlChoice.setMaxWidth(controlWidth);
 
         // === 5. Nút quay lại ===
-        StackPane backButton = createStyledButton("QUAY LẠI");
+        StackPane backButton = createStyledButton("BACK");
         backButton.setOnMouseClicked(e -> showSettingsPane(false));
 
         // === 6. Bố cục chính ===
