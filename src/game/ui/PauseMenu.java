@@ -15,7 +15,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 
 import java.io.FileInputStream;
@@ -265,7 +264,7 @@ public class PauseMenu {
     /** Helper để tạo nhãn (Label) chuẩn */
     private Label createLabel(String text, int fontSize, String color) {
         Label label = new Label(text);
-        label.setFont(Font.font("Arial", FontWeight.BOLD, fontSize));
+        label.setFont(Font.loadFont("file:assets/HALLOWEEN.ttf", fontSize));
         label.setTextFill(Color.web(color));
         return label;
     }

@@ -16,7 +16,7 @@ public class GameOverRenderer {
 
         //Set font chữ cho gameover
         String gameOver = "GAME OVER";;
-        Font gameOverFont = Font.loadFont("file:assets/upheavtt.ttf", 64);
+        Font gameOverFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 64);
             //Vẽ bóng
         gc.setFont(gameOverFont);
         gc.setFill(Color.color(0, 0, 0, 0.6)); // red = 0, green = 0, blue = 0, trong suốt = 0.6 / 1.0
@@ -58,7 +58,7 @@ public class GameOverRenderer {
 
         // Vẽ score
         String scoreText = "Score: ";
-        Font scoreFont = Font.loadFont("file:assets/ari-w9500-display.ttf", 35);
+        Font scoreFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 35);
         gc.setFont(scoreFont);
             // vẽ viền
         gc.setStroke(Color.WHITE);
@@ -70,7 +70,7 @@ public class GameOverRenderer {
 
         // Vẽ message
         String message = "You Are Chicken!!!";
-        Font messageFont = Font.loadFont("file:assets/PixelWarden.ttf", 33);
+        Font messageFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 33);
         gc.setFont(messageFont);
             // vẽ viền
         gc.setStroke(Color.WHITE);
@@ -82,7 +82,7 @@ public class GameOverRenderer {
 
         // Vẽ instruction
         String gameOverInstruction = "Press R to RESTART or ESC to QUIT";
-        Font gameOverInstructionFont = Font.loadFont("file:assets/VSWISEC.ttf", 22);
+        Font gameOverInstructionFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 22);
             // Vẽ bóng
         gc.setFont(gameOverInstructionFont);
         gc.setFill(Color.PURPLE);

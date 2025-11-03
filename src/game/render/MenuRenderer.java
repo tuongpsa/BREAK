@@ -26,7 +26,7 @@ public class MenuRenderer {
         
         // Vẽ tiêu đề game
         String title = "BRICK BREAKER";
-        Font titleFont = Font.loadFont("file:assets/upheavtt.ttf", 48);
+        Font titleFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 48);
         gc.setFont(titleFont);
         gc.setTextAlign(TextAlignment.CENTER);
         
@@ -69,14 +69,14 @@ public class MenuRenderer {
         
         // Vẽ hướng dẫn
         String instruction = hasSave ? "Click CONTINUE or START" : "Click START GAME to begin";
-        Font instructionFont = Font.loadFont("file:assets/VSWISEC.ttf", 16);
+        Font instructionFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 16);
         gc.setFont(instructionFont);
         gc.setFill(Color.LIGHTGRAY);
         gc.fillText(instruction, width / 2, height / 2 + 140);
         
         // Vẽ thông tin game
         String info = "Use LEFT/RIGHT arrow keys to move paddle";
-        gc.setFont(Font.font(14));
+        gc.setFont(Font.loadFont("file:assets/HALLOWEEN.ttf", 14));
         gc.setFill(Color.GRAY);
         gc.fillText(info, width / 2, height / 2 + 170);
     }
@@ -104,7 +104,7 @@ public class MenuRenderer {
         gc.strokeRoundRect(x, y, buttonWidth, buttonHeight, 10, 10);
         
         // Vẽ text trên nút
-        Font buttonFont = Font.loadFont("file:assets/ari-w9500-display.ttf", 20);
+        Font buttonFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 20);
         gc.setFont(buttonFont);
         gc.setFill(Color.WHITE);
         gc.setTextAlign(TextAlignment.CENTER);
