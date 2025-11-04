@@ -1,14 +1,14 @@
 level=1
-score=20
+score=10
 paddleX=0.0
 paddleW=480.0
 shieldLives=0
 laserShots=0
-ballX=437.00156
-ballY=232.27745
-ballVX=269.2611
-ballVY=964.36426
-bricksCount=19
+ballX=405.01007
+ballY=208.15117
+ballVX=269.66678
+ballVY=-964.2509
+bricksCount=21
 78.0,50.0,1
 125.0,50.0,1
 172.0,50.0,1
@@ -27,4 +27,6 @@ bricksCount=19
 125.0,100.0,1
 172.0,100.0,1
 219.0,100.0,1
+266.0,100.0,1
 313.0,100.0,1
+360.0,100.0,1

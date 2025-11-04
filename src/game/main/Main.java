@@ -172,24 +172,47 @@ public class Main extends Application {
     }
 
     private void switchToGameContinue() {
-        // Dừng nhạc menu
-        if (menuPanel != null) {
-            menuPanel.stopMenuMusic();
-            menuPanel.resetContinueGame();
+        try {
+            // Dừng nhạc menu
+            if (menuPanel != null) {
+                menuPanel.stopMenuMusic();
+                menuPanel.resetContinueGame();
+            }
+
+            // Load save TRƯỚC khi set scene và start game loop
+            boolean loadSuccess = game.core.SaveManager.load(gamePanel.getGame());
+            if (!loadSuccess) {
+                // Nếu load thất bại, reset game về trạng thái ban đầu
+                gamePanel.getGame().resetGame();
+            }
+
+            // Set scene và start game loop SAU KHI đã load
+            if (gameScene != null && primaryStage != null) {
+                primaryStage.setScene(gameScene);
+                gamePanel.setMenuCallback(this::switchToMenu);
+                gamePanel.startGameLoop();
+                gamePanel.requestFocus();
+
+                // Đã dùng continue: ẩn lại cho đến khi save mới
+                game.core.SaveManager.clearSessionSave();
+
+                setupGameInput(gameScene);
+                startGameOverLoop();
+            }
+        } catch (Exception e) {
+            System.err.println("Error in switchToGameContinue: " + e.getMessage());
+            e.printStackTrace();
+            // Fallback: reset và chuyển sang game mới
+            if (gamePanel != null) {
+                gamePanel.getGame().resetGame();
+            }
+            if (gameScene != null && primaryStage != null) {
+                primaryStage.setScene(gameScene);
+                if (gamePanel != null) {
+                    gamePanel.startGameLoop();
+                }
+            }
         }
-
-        primaryStage.setScene(gameScene);
-        gamePanel.setMenuCallback(this::switchToMenu);
-        gamePanel.startGameLoop();
-        gamePanel.requestFocus();
-
-        // Load save
-        game.core.SaveManager.load(gamePanel.getGame());
-        // Đã dùng continue: ẩn lại cho đến khi save mới
-        game.core.SaveManager.clearSessionSave();
-
-        setupGameInput(gameScene);
-        startGameOverLoop();
     }
     
     private void startGameOverLoop() {

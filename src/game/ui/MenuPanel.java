@@ -59,8 +59,14 @@ public class MenuPanel extends Canvas {
     private void handleMouseClick(double x, double y) {
         // Biến kiểm tra xem có click vào nút nào không để phát âm thanh
         boolean buttonClicked = false;
+        boolean hasSave = game.core.SaveManager.hasSessionSave();
 
-        if (isPointInStartButton(x, y)) {
+        // Kiểm tra Continue TRƯỚC Start (vì Continue ở trên Start)
+        if (hasSave && isPointInContinueButton(x, y)) {
+            continueGame = true;
+            buttonClicked = true;
+        }
+        else if (isPointInStartButton(x, y)) {
             startGame = true;
             buttonClicked = true;
         }
@@ -74,10 +80,6 @@ public class MenuPanel extends Canvas {
         }
         else if (isPointInQuitButton(x, y)) {
             quitGame = true;
-            buttonClicked = true;
-        }
-        else if (isPointInContinueButton(x, y) && game.core.SaveManager.hasSessionSave()) {
-            continueGame = true;
             buttonClicked = true;
         }
 
@@ -183,7 +185,7 @@ public class MenuPanel extends Canvas {
         if (!game.core.SaveManager.hasSessionSave()) return false;
         double buttonWidth = 250;
         double buttonHeight = 80;
-        double buttonX = (getWidth() - buttonWidth) / 2 +10;
+        double buttonX = (getWidth() - buttonWidth) / 2 + 10;
         double buttonY = getBaseY() - 90; // (baseY - 90)
 
         return x >= buttonX && x <= buttonX + buttonWidth &&

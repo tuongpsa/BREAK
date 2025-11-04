@@ -51,6 +51,7 @@ public class SaveManager {
         if (!f.exists()) return false;
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             int level = 1;
+            int score = 0;
             float paddleX = game.getPaddle().getX();
             float paddleW = game.getPaddle().getWidth();
             int shieldLives = 0;
@@ -60,9 +61,7 @@ public class SaveManager {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("level=")) level = Integer.parseInt(line.substring(6));
-                else if (line.startsWith("score=")) {
-                    // Score read but not applied (no setScore method available)
-                }
+                else if (line.startsWith("score=")) score = Integer.parseInt(line.substring(6));
                 else if (line.startsWith("paddleX=")) paddleX = Float.parseFloat(line.substring(8));
                 else if (line.startsWith("paddleW=")) paddleW = Float.parseFloat(line.substring(8));
                 else if (line.startsWith("shieldLives=")) shieldLives = Integer.parseInt(line.substring(12));
@@ -78,6 +77,9 @@ public class SaveManager {
                     // Brick line ignored in first pass; handled below
                 }
             }
+
+            // Reset game over state
+            game.setGameOver(false);
 
             // Re-create level and bricks
             game.getLevelManager().setLevel(level);
@@ -101,14 +103,20 @@ public class SaveManager {
                 }
             }
 
+            // Remove destroyed bricks (HP <= 0)
+            List<Brick> bricks = game.getBricks();
+            for (int i = bricks.size() - 1; i >= 0; i--) {
+                if (bricks.get(i).isDestroyed()) {
+                    bricks.remove(i);
+                }
+            }
+
+            // Apply score
+            game.setScore(score);
+
             // Apply paddle
             game.getPaddle().setWidth(paddleW);
             game.getPaddle().setX(paddleX);
-
-            // Apply score
-            // There is no direct setScore; adjust via reflection-safe approach: use addScore delta
-            // Simpler: we can keep a private score setter, but for now adjust via difference is not available.
-            // Skipping score apply to avoid complexity.
 
             // Apply ball (first)
             Ball ball = game.getBall();
@@ -122,7 +130,6 @@ public class SaveManager {
             // Reset transient states
             game.clearPowerUpsOnLevelUp();
             // Restore shield/laser counts
-            // Use reflection or add setters; for simplicity, we rely on clearPowerUpsOnLevelUp zeroing then reapply via Game API
             for (int i = 0; i < shieldLives; i++) game.activateShield();
             while (laserShots-- > 0) game.activateLaser();
 

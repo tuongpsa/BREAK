@@ -221,6 +221,7 @@ public class Game {
     public List<PowerUp> getPowerUps(){ return powerUps; }
     public int getScore(){ return score; }
     public void addScore(int s){ score += s * scoreMultiplier; }
+    public void setScore(int s){ score = s; }
     public float getWidth(){ return width; }
     public float getHeight(){ return height; }
     public int getScoreMultiplier(){ return scoreMultiplier; }
