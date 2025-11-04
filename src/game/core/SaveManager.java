@@ -141,10 +141,33 @@ public class SaveManager {
     }
 
     public static boolean hasSessionSave() {
-        return sessionHasSave;
+        // Kiểm tra cả file save và session flag
+        // Nếu có file save thì luôn cho phép Continue
+        return sessionHasSave || hasSave();
     }
 
     public static void clearSessionSave() {
+        sessionHasSave = false;
+    }
+    
+    /**
+     * Khởi tạo session save từ file save nếu có
+     * Gọi khi khởi động game để khôi phục Continue button
+     */
+    public static void initializeSessionSave() {
+        if (hasSave()) {
+            sessionHasSave = true;
+        }
+    }
+    
+    /**
+     * Xóa file save và clear session
+     */
+    public static void deleteSave() {
+        File f = new File(SAVE_FILE);
+        if (f.exists()) {
+            f.delete();
+        }
         sessionHasSave = false;
     }
 }

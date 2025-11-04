@@ -72,6 +72,17 @@ public class Main extends Application {
 
         stage.setTitle("Brick Breaker Demo");
         stage.setScene(menuScene);
+        
+        // Khởi tạo session save từ file nếu có (để hiển thị Continue khi khởi động lại)
+        game.core.SaveManager.initializeSessionSave();
+        
+        // Lưu game khi đóng cửa sổ (nếu đang chơi)
+        stage.setOnCloseRequest(e -> {
+            if (gamePanel != null && !gamePanel.getGame().isGameOver()) {
+                game.core.SaveManager.save(gamePanel.getGame());
+            }
+        });
+        
         stage.show();
 
         // 4. Thiết lập Input và Listener (Rất quan trọng)
@@ -153,12 +164,11 @@ public class Main extends Application {
         if (menuPanel != null) {
             menuPanel.stopMenuMusic();
         }
-// <<< SỬA LỖI 2: Xóa khối "else"
         // GamePanel đã được khởi tạo 1 lần (và duy nhất) trong hàm start().
         // Chúng ta chỉ cần reset game.
         gamePanel.getGame().resetGame();
-        // Bắt đầu game mới: ẩn continue trong phiên
-        game.core.SaveManager.clearSessionSave();
+        // Bắt đầu game mới: xóa save cũ
+        game.core.SaveManager.deleteSave();
 
         primaryStage.setScene(gameScene);
         gamePanel.setMenuCallback(this::switchToMenu);
@@ -235,9 +245,9 @@ public class Main extends Application {
             gamePanel.stopGameLoop();
         }
 
-        // Nếu quay về từ game over, không cho Continue
+        // Nếu quay về từ game over, xóa save và không cho Continue
         if (gamePanel != null && gamePanel.getGame().isGameOver()) {
-            game.core.SaveManager.clearSessionSave();
+            game.core.SaveManager.deleteSave();
         }
         primaryStage.setScene(menuScene);
         menuPanel.resetStartGame();
