@@ -20,7 +20,7 @@ public class Game {
 
     private List<Ball> balls = new ArrayList<>();
     private final float ballRadius = 15;
-    private final float ballSpeed = 500.f;
+    private  float ballSpeed = 500.f;
 
     private Paddle paddle;
     private final float paddleWidth = width/2 ;
@@ -258,6 +258,10 @@ public class Game {
         return this.collisionHandler;
     }
 
+    // Setter cho ballSpeed
+    public void setBallSpeed(float newSpeed) {
+        this.ballSpeed = newSpeed;
+    }
     // Power-up methods
     public boolean consumeShieldIfAvailable(Ball ball, float screenHeight) {
         if (shieldLives > 0 && ball != null) {

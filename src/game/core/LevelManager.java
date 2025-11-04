@@ -38,6 +38,7 @@ public class LevelManager {
         float tocdobandau = game.getBallSpeed(); // Lấy tốc độ GỐC (ví dụ: 250.f)
         float tocdomoi = tocdobandau * ballSpeedMultiplier;
         float ballRadius = game.getBallRadius();
+        game.setBallSpeed(tocdomoi);
         float initX = (game.getWidth() / 2) - ballRadius;
         float initY = game.getHeight() - 30;
         Ball newBall = new Ball(initX, initY, ballRadius, tocdomoi);
