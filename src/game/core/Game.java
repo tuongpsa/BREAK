@@ -20,10 +20,10 @@ public class Game {
 
     private List<Ball> balls = new ArrayList<>();
     private final float ballRadius = 15;
-    private  float ballSpeed = 500.f;
+    private  float ballSpeed = 1000.f;
 
     private Paddle paddle;
-    private final float paddleWidth = width/2 ;
+    private final float paddleWidth = width ;
     private final float paddleHeight = 7;
 
     private List<Brick> bricks = new ArrayList<>();
@@ -234,12 +234,34 @@ public class Game {
         gameOver = false;
         score = 0;
         scoreMultiplier = 1;
+        
+        // Reset level về 1
+        levelManager.setLevel(1);
+        
+        // Reset ball speed về tốc độ ban đầu
+        ballSpeed = 1000.f;
+        
+        // Reset tất cả power-up states
+        speedBoostActive = false;
+        bigPaddleActive = false;
+        slowBallActive = false;
+        shieldLives = 0;
+        laserShots = 0;
+        activePowerUps.clear();
+        powerUps.clear();
+        bullets.clear();
+        
+        // Reset balls và paddle
         balls.clear();
         balls.add(new Ball((width/2)-ballRadius, height-150, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
-        powerUps.clear();
-        activePowerUps.clear(); // Xóa active power-ups khi reset
-        createBricks(levelManager.getLevel());
+        
+        // Reset paddle về kích thước và tốc độ mặc định
+        paddle.setWidth(paddleWidth);
+        paddle.setMoveSpeed(350f);
+        
+        // Tạo lại gạch cho level 1
+        createBricks(1);
     }
 
     // Constructor mặc định cho tương thích ngược
