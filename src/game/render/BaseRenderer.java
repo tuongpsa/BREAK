@@ -9,7 +9,7 @@ public abstract class BaseRenderer {
     protected Image image;
     protected String text;
     protected double x, y; // vị trí
-    protected Font font = Font.loadFont("file:assets/HALLOWEEN.ttf", 24); // ti le font
+    protected Font font = Font.loadFont("file:assets/Spooky.ttf", 24); // ti le font
     protected Color textColor = Color.WHITE; // mau sac font
 
 

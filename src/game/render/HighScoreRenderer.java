@@ -29,7 +29,7 @@ public class HighScoreRenderer {
         
         // Vẽ tiêu đề
         String title = "HIGH SCORES";
-        Font titleFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 36);
+        Font titleFont = Font.loadFont("file:assets/Spooky.ttf", 36);
         gc.setFont(titleFont);
         gc.setTextAlign(TextAlignment.CENTER);
         
@@ -61,7 +61,7 @@ public class HighScoreRenderer {
         
         // Vẽ hướng dẫn
         String instruction = "Click BACK TO MENU to return";
-        Font instructionFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 14);
+        Font instructionFont = Font.loadFont("file:assets/Spooky.ttf", 14);
         gc.setFont(instructionFont);
         gc.setFill(Color.LIGHTGRAY);
         gc.fillText(instruction, width / 2, height - 40);
@@ -83,7 +83,7 @@ public class HighScoreRenderer {
         gc.strokeRoundRect(tableX, startY - 10, tableWidth, Math.max(5, highScores.size()) * rowHeight + 20, 15, 15);
         
         // Vẽ header
-        Font headerFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 18);
+        Font headerFont = Font.loadFont("file:assets/Spooky.ttf", 18);
         gc.setFont(headerFont);
         gc.setFill(Color.YELLOW);
         gc.setTextAlign(TextAlignment.CENTER);
@@ -92,7 +92,7 @@ public class HighScoreRenderer {
         gc.fillText("SCORE", tableX + tableWidth - 50, startY - 20);
         
         // Vẽ danh sách điểm
-        Font scoreFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 16);
+        Font scoreFont = Font.loadFont("file:assets/Spooky.ttf", 16);
         gc.setFont(scoreFont);
         
         if (highScores.isEmpty()) {
@@ -129,7 +129,7 @@ public class HighScoreRenderer {
                 gc.fillText(String.valueOf(entry.getScore()), tableX + tableWidth - 50, y);
                 
                 // Vẽ ngày (nhỏ hơn)
-                Font dateFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 12);
+                Font dateFont = Font.loadFont("file:assets/Spooky.ttf", 12);
                 gc.setFont(dateFont);
                 gc.setFill(Color.GRAY);
                 gc.fillText(entry.getFormattedDate(), tableX + tableWidth / 2, y + 20);
@@ -163,7 +163,7 @@ public class HighScoreRenderer {
         gc.strokeRoundRect(x, y, buttonWidth, buttonHeight, 10, 10);
         
         // Vẽ text trên nút
-        Font buttonFont = Font.loadFont("file:assets/HALLOWEEN.ttf", 18);
+        Font buttonFont = Font.loadFont("file:assets/Spooky.ttf", 18);
         gc.setFont(buttonFont);
         gc.setFill(Color.WHITE);
         gc.setTextAlign(TextAlignment.CENTER);

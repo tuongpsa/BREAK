@@ -188,7 +188,7 @@ public class GamePanel extends GameScreen {
 
         // Vẽ điểm, level
         gc.setFill(Color.WHITE);
-        gc.setFont(Font.loadFont("file:assets/HALLOWEEN.ttf", 18));
+        gc.setFont(Font.loadFont("file:assets/Spooky.ttf", 18));
         gc.fillText("Score: " + game.getScore(),10,40);
         gc.fillText("Level: " + game.getLevelManager().getLevel(),10,20);
         
@@ -338,7 +338,7 @@ public class GamePanel extends GameScreen {
                     break;
             }
             gc.setFill(Color.WHITE);
-            gc.setFont(Font.loadFont("file:assets/HALLOWEEN.ttf", 12));
+            gc.setFont(Font.loadFont("file:assets/Spooky.ttf", 12));
             String symbol = getPowerUpSymbol(powerUp.getType());
             gc.fillText(symbol, x + width/2 - 5, y + height/2 + 5);
         }
@@ -374,7 +374,7 @@ public class GamePanel extends GameScreen {
         Map<PowerUpType, Float> activePowerUps = game.getActivePowerUps();
         if (activePowerUps == null || activePowerUps.isEmpty()) return;
         gc.setFill(Color.YELLOW);
-        gc.setFont(Font.loadFont("file:assets/HALLOWEEN.ttf", 14));
+        gc.setFont(Font.loadFont("file:assets/Spooky.ttf", 14));
         float yOffset = 60;
         int index = 0;
         for (Map.Entry<PowerUpType, Float> entry : activePowerUps.entrySet()) {

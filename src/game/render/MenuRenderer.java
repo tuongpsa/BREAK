@@ -47,14 +47,14 @@ public class MenuRenderer {
             // Load (tải) ảnh
             backgroundImage = loadImage("background2.png");
             menuPanelImage = loadImage("W-4.png");
-            crownIcon = loadImage("G-2.png");
+            crownIcon = loadImage("G-1.png");
             buttonImage_Normal = loadImage("choose.png");
             buttonImage_Hover = loadImage("choose(click).png");
 
             // Load (tải) fonts (bạn có thể cần điều chỉnh đường dẫn)
-            titleFont = loadFont("upheavtt.ttf", 48);
-            buttonFont = loadFont("ari-w9500-display.ttf", 20);
-            instructionFont = loadFont("VSWISEC.ttf", 16);
+            titleFont = loadFont("Spooky.ttf", 46);
+            buttonFont = loadFont("Spooky.ttf", 20);
+            instructionFont = loadFont("Spooky.ttf", 16);
 
         } catch (Exception e) {
             System.err.println("LỖI NGHIÊM TRỌNG: Không thể load assets cho MenuRenderer!");
@@ -82,20 +82,20 @@ public class MenuRenderer {
 
         // --- 2. Tính toán tọa độ Khung Menu (W-4.png) ---
         // (Vẽ ở giữa màn hình)
-        double panelWidth = 400;  // Chiều rộng mong muốn của khung
-        double panelHeight = 500; // Chiều cao mong muốn của khung
+        double panelWidth = 500;  // Chiều rộng mong muốn của khung
+        double panelHeight = 600; // Chiều cao mong muốn của khung
         double panelX = (width - panelWidth) / 2;
         double panelY = (height - panelHeight) / 2;
 
         // Vẽ khung
         if (menuPanelImage != null) {
-            gc.drawImage(menuPanelImage, panelX, panelY, panelWidth, panelHeight);
+            gc.drawImage(menuPanelImage, panelX + 25, panelY, panelWidth, panelHeight);
         }
 
         // --- 3. Vẽ Icon Vương miện (G-2.jpg) ---
         // (Vẽ phía trên tiêu đề, bên trong khung)
         if (crownIcon != null) {
-            gc.drawImage(crownIcon, width / 2 - 50, panelY + 30, 100, 100);
+            gc.drawImage(crownIcon, width / 2 -250, panelY - 100, 500, 300);
         }
 
         // --- 4. Vẽ Chữ Tiêu đề (BRICK BREAKER) ---
@@ -104,33 +104,34 @@ public class MenuRenderer {
         gc.setFont(titleFont);
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFill(Color.WHITE);
-        gc.fillText(title, width / 2, panelY + 180); // Tọa độ Y đã điều chỉnh
+        gc.fillText(title, width / 2, panelY +50); // Tọa độ Y đã điều chỉnh
 
         // --- 5. Vẽ các nút ---
         // Tọa độ Y cơ sở (nằm giữa khung panel)
-        // Đây là các tọa độ mà file MenuPanel.java của bạn PHẢI sử dụng
-        double baseY = panelY + panelHeight / 2;
+        double baseY = panelY + panelHeight / 2- 100;
 
         boolean hasSave = SaveManager.hasSessionSave();
 
         if (hasSave) {
-            // Căn cứ vào file MenuPanel.java: Continue ở -60, Start ở 0
-            drawButton(gc, width, "CONTINUE", baseY - 60, 200, 50, "CONTINUE", hoveredButton);
-            drawButton(gc, width, "START GAME", baseY, 200, 50, "START", hoveredButton);
+            drawButton(gc, width, "CONTINUE", baseY-90, 250, 80, "CONTINUE", hoveredButton);
+            drawButton(gc, width, "START GAME", baseY-30, 250, 80, "START", hoveredButton);
         } else {
-            // Chỉ vẽ nút Start (vị trí 0)
-            drawButton(gc, width, "START GAME", baseY, 200, 50, "START", hoveredButton);
+            drawButton(gc, width, "START GAME", baseY-30, 250, 80, "START", hoveredButton);
         }
 
         // Các nút còn lại (High Score ở +60, Quit ở +120)
-        drawButton(gc, width, "HIGH SCORE", baseY + 60, 200, 50, "HIGH_SCORE", hoveredButton);
-        drawButton(gc, width, "QUIT", baseY + 120, 150, 40, "QUIT", hoveredButton);
+        drawButton(gc, width, "HIGH SCORE", baseY + 30, 250, 80, "HIGH_SCORE", hoveredButton);
+        drawButton(gc, width, "QUIT", baseY + 90, 150, 80, "QUIT", hoveredButton);
 
         // --- 6. Vẽ Hướng dẫn ---
         String instruction = hasSave ? "Click CONTINUE or START" : "Click START GAME";
         gc.setFont(instructionFont);
         gc.setFill(Color.LIGHTGRAY);
-        gc.fillText(instruction, width / 2, baseY + 180); // Bên dưới nút Quit
+        gc.fillText(instruction, width / 2 + 10, baseY + 180); // Bên dưới nút Quit
+        String instructionPlay = "Use Arrow Keys to play";
+        gc.fillText(instructionPlay, width / 2 + 10, baseY + 202); // (180 + 22)
+        String instructionPause = "Press ESC to pause";
+        gc.fillText(instructionPause, width / 2 + 10, baseY + 224); // (202 + 22)
     }
 
     /**
@@ -144,7 +145,7 @@ public class MenuRenderer {
                             double buttonWidth, double buttonHeight,
                             String buttonIdentifier, String hoveredButton) {
 
-        double x = (width - buttonWidth) / 2;
+        double x = (width - buttonWidth) / 2+10;
 
         // 1. CHỌN ảnh để vẽ (Normal hay Hover)
         Image imageToDraw;
@@ -171,7 +172,7 @@ public class MenuRenderer {
         gc.setFill(Color.WHITE);
         gc.setTextAlign(TextAlignment.CENTER);
         // (Căn chỉnh Y của text cho khớp với ảnh nút)
-        gc.fillText(text, width / 2, y + buttonHeight / 2 + 7);
+        gc.fillText(text, width / 2 + 10, y + buttonHeight / 2 + 9);
     }
 
     // --- CÁC HÀM HELPER ĐỂ LOAD TÀI NGUYÊN ---

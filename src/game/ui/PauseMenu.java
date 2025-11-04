@@ -264,7 +264,7 @@ public class PauseMenu {
     /** Helper để tạo nhãn (Label) chuẩn */
     private Label createLabel(String text, int fontSize, String color) {
         Label label = new Label(text);
-        label.setFont(Font.loadFont("file:assets/HALLOWEEN.ttf", fontSize));
+        label.setFont(Font.loadFont("file:assets/Spooky.ttf", fontSize));
         label.setTextFill(Color.web(color));
         return label;
     }

@@ -11,7 +11,7 @@ public class LevelRender extends BaseRenderer {
     private final long displayDuration = 3000; // 3 giây
 
     public LevelRender() {
-        this.font = Font.loadFont("file:assets/HALLOWEEN.ttf", 48);
+        this.font = Font.loadFont("file:assets/Spooky.ttf", 48);
         this.textColor = Color.YELLOW;
     }
 

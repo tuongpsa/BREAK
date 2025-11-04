@@ -5,7 +5,7 @@ import game.render.LevelRender;
 
 public class LevelManager {
     private int level = 1;            // cấp hiện tại
-    private float ballSpeedMultiplier = 1.0f; // hệ số tốc độ bóng
+    private float ballSpeedMultiplier = 1.07f; // hệ số tốc độ bóng
     private LevelRender levelRender;
 
     public void levelUp(Game game) {
@@ -30,6 +30,8 @@ public class LevelManager {
         // (đã clear trong clearPowerUpsOnLevelUp)
 
         game.createBricks(level);
+        System.out.println("DEBUG: getBallSpeed() trả về: " + game.getBallSpeed());
+        System.out.println("DEBUG: ballSpeedMultiplier là: " + ballSpeedMultiplier);
 
         // Tăng tốc độ bóng
         game.getBalls().clear();
@@ -38,12 +40,13 @@ public class LevelManager {
         float ballRadius = game.getBallRadius();
         float initX = (game.getWidth() / 2) - ballRadius;
         float initY = game.getHeight() - 30;
-        Ball newBall = new Ball(initX, initY, ballRadius,tocdobandau);
+        Ball newBall = new Ball(initX, initY, ballRadius, tocdomoi);
         newBall.setVelX(1);
         newBall.setVelY(-Math.abs(tocdomoi));
         game.getBalls().add(newBall);
 
         System.out.println("Level up! → Level " + level);
+        System.out.println("New ball speed: " + tocdomoi);
     }
 
     public int getLevel() {

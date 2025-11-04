@@ -219,7 +219,7 @@ public class CollisionHandler {
                                 }
                                 // Có 20% chance drop power-up
                                 synchronized (powerUps) {
-                                    if (Math.random() < 1) {
+                                    if (Math.random() < 0.2) {
                                         dropPowerUp(brick.getX(), brick.getY(), powerUps, game);
                                     }
                                 }

@@ -83,12 +83,10 @@ public class MenuPanel extends Canvas {
 
         // Phát âm thanh click nếu click trúng một nút
         if (buttonClicked && audioManager != null) {
-            // (Giả sử bạn có một âm thanh "click" trong AudioManager)
             // audioManager.playClickSound();
         }
     }
 
-    // --- HÀM MỚI ĐƯỢC VIẾT LẠI ---
     private void handleMouseMove(double x, double y) {
         String oldHover = hoveredButton;
         String newHover = ""; // Mặc định là không hover gì
@@ -125,36 +123,35 @@ public class MenuPanel extends Canvas {
     }
 
     // --- CÁC HÀM TÍNH TOÁN TỌA ĐỘ ---
-    // Các hàm này PHẢI KHỚP với tọa độ trong MenuRenderer
     // (Giả định MenuRenderer vẽ panel W-4.png ở giữa)
 
     private double getPanelY() {
-        double panelHeight = 500; // Phải giống trong MenuRenderer
+        double panelHeight = 600; // Phải giống trong MenuRenderer
         return (getHeight() - panelHeight) / 2;
     }
 
     private double getBaseY() {
-        double panelHeight = 500; // Phải giống trong MenuRenderer
-        return getPanelY() + panelHeight / 2;
+        double panelHeight = 600; // Phải giống trong MenuRenderer
+        return getPanelY() + panelHeight / 2 - 100;
     }
 
     private boolean isPointInStartButton(double x, double y) {
         boolean hasSave = game.core.SaveManager.hasSessionSave();
-        double buttonWidth = 200;
-        double buttonHeight = 50;
-        double buttonX = (getWidth() - buttonWidth) / 2;
+        double buttonWidth = 250;
+        double buttonHeight = 80;
+        double buttonX = (getWidth() - buttonWidth) / 2 + 10;
         // Tọa độ Y thay đổi dựa trên việc có save hay không
-        double buttonY = hasSave ? getBaseY() : getBaseY(); // Gốc Y là baseY
+        double buttonY = getBaseY() - 30; // Gốc Y là baseY
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                 y >= buttonY && y <= buttonY + buttonHeight;
     }
 
     private boolean isPointInHighScoreButton(double x, double y) {
-        double buttonWidth = 200;
-        double buttonHeight = 50;
-        double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getBaseY() + 60; // (baseY + 60)
+        double buttonWidth = 250;
+        double buttonHeight = 80;
+        double buttonX = (getWidth() - buttonWidth) / 2 + 10;
+        double buttonY = getBaseY() + 30;
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                 y >= buttonY && y <= buttonY + buttonHeight;
@@ -163,10 +160,10 @@ public class MenuPanel extends Canvas {
     private boolean isPointInResumeButton(double x, double y) {
         // (Đây là nút cho Pause Menu, có thể bạn sẽ cần tọa độ khác)
         // (Tạm thời dùng tọa độ của Continue)
-        double buttonWidth = 200;
-        double buttonHeight = 50;
-        double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getBaseY() - 60; // (baseY - 60)
+        double buttonWidth = 250;
+        double buttonHeight = 80;
+        double buttonX = (getWidth() - buttonWidth) / 2 + 10;
+        double buttonY = getBaseY() - 90; // (baseY - 90)
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                 y >= buttonY && y <= buttonY + buttonHeight;
@@ -174,9 +171,9 @@ public class MenuPanel extends Canvas {
 
     private boolean isPointInQuitButton(double x, double y) {
         double buttonWidth = 150;
-        double buttonHeight = 40;
-        double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getBaseY() + 120; // (baseY + 120)
+        double buttonHeight = 80;
+        double buttonX = (getWidth() - buttonWidth) / 2 +10;
+        double buttonY = getBaseY() + 90; // (baseY + 90)
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                 y >= buttonY && y <= buttonY + buttonHeight;
@@ -184,10 +181,10 @@ public class MenuPanel extends Canvas {
 
     private boolean isPointInContinueButton(double x, double y) {
         if (!game.core.SaveManager.hasSessionSave()) return false;
-        double buttonWidth = 200;
-        double buttonHeight = 50;
-        double buttonX = (getWidth() - buttonWidth) / 2;
-        double buttonY = getBaseY() - 60; // (baseY - 60)
+        double buttonWidth = 250;
+        double buttonHeight = 80;
+        double buttonX = (getWidth() - buttonWidth) / 2 +10;
+        double buttonY = getBaseY() - 90; // (baseY - 90)
 
         return x >= buttonX && x <= buttonX + buttonWidth &&
                 y >= buttonY && y <= buttonY + buttonHeight;
