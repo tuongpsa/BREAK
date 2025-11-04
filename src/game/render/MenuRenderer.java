@@ -45,7 +45,7 @@ public class MenuRenderer {
     public MenuRenderer() {
         try {
             // Load (tải) ảnh
-            backgroundImage = loadImage("background2.png");
+            backgroundImage = loadImage("back1.png");
             menuPanelImage = loadImage("W-4.png");
             crownIcon = loadImage("G-1.png");
             buttonImage_Normal = loadImage("choose.png");

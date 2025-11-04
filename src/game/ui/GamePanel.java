@@ -76,7 +76,7 @@ public class GamePanel extends GameScreen {
         brickImages.put(2, brick_hp2);
         brickImages.put(1, brick_hp1);
 
-        background = new Background("assets/background2.png");
+        background = new Background("assets/back2.png");
 
         // Power-up images (dùng ảnh sẵn có trong assets làm placeholder)
         powerUpImages = new HashMap<>();
