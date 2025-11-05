@@ -31,6 +31,8 @@ public class Main extends Application {
     private Scene menuScene;
     private Scene highScoreScene;
     private AnimationTimer gameOverTimer;
+    private AnimationTimer menuTimer;
+    private AnimationTimer highScoreTimer;
 
 
     @Override // ghi đè lên phg thức start của lớp Application
@@ -135,7 +137,11 @@ public class Main extends Application {
         });
     }
     private void startMenuLoop() {
-        AnimationTimer menuTimer = new AnimationTimer() {
+        // Stop previous menu timer if any to avoid overlapping timers
+        if (menuTimer != null) {
+            menuTimer.stop();
+        }
+        menuTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (menuPanel.isStartGame()) {
@@ -245,6 +251,14 @@ public class Main extends Application {
             gamePanel.stopGameLoop();
         }
 
+        // Stop any running timers from other screens
+        if (gameOverTimer != null) {
+            gameOverTimer.stop();
+        }
+        if (highScoreTimer != null) {
+            highScoreTimer.stop();
+        }
+
         // Nếu quay về từ game over, xóa save và không cho Continue
         if (gamePanel != null && gamePanel.getGame().isGameOver()) {
             game.core.SaveManager.deleteSave();
@@ -268,6 +282,13 @@ public class Main extends Application {
         // Dừng game loop cũ nếu có
         if (gamePanel != null) {
             gamePanel.stopGameLoop();
+        }
+        // Stop any running timers to avoid overlap when returning from pause
+        if (gameOverTimer != null) {
+            gameOverTimer.stop();
+        }
+        if (highScoreTimer != null) {
+            highScoreTimer.stop();
         }
         // Lưu khi thoát ra menu từ Pause → cho phép Continue trong phiên
         if (gamePanel != null) {
@@ -297,7 +318,11 @@ public class Main extends Application {
     }
     
     private void startHighScoreLoop() {
-        AnimationTimer highScoreTimer = new AnimationTimer() {
+        // Stop previous high score timer if any
+        if (highScoreTimer != null) {
+            highScoreTimer.stop();
+        }
+        highScoreTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (highScorePanel.isBackToMenu()) {
