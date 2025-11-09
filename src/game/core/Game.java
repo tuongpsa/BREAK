@@ -49,8 +49,9 @@ public class Game {
     private LevelManager levelManager = new LevelManager();
     private final CollisionHandler collisionHandler;
 
-    public Game(AudioManager audioManager) {
-        this.collisionHandler = new CollisionHandler(audioManager, this.levelManager);
+    public Game(){
+        this.collisionHandler = new CollisionHandler(this.levelManager);
+
         balls.add(new Ball((width/2)-ballRadius, height-20, ballRadius, ballSpeed));
         paddle = new Paddle((width-paddleWidth)/2, height-20, paddleWidth, paddleHeight);
         createBricks(levelManager.getLevel());
@@ -263,11 +264,6 @@ public class Game {
         
         // Tạo lại gạch cho level 1
         createBricks(1);
-    }
-
-    // Constructor mặc định cho tương thích ngược
-    public Game() {
-        this(null);
     }
 
     // Getter cho ballSpeed

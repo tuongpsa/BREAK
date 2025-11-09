@@ -10,7 +10,6 @@ import javafx.scene.input.KeyEvent;
  * Lớp cơ sở cho mọi màn hình game.
  */
 public abstract class GameScreen extends Canvas {
-    protected AudioManager audioManager;
     protected PauseManager pauseManager;
 
     protected boolean leftPressed = false;
@@ -18,9 +17,8 @@ public abstract class GameScreen extends Canvas {
 
     private AnimationTimer gameTimer;
 
-    public GameScreen(double width, double height, AudioManager audioManager, PauseManager pauseManager) {
+    public GameScreen(double width, double height, PauseManager pauseManager) {
         super(width, height);
-        this.audioManager = audioManager;
         this.pauseManager = pauseManager;
 
         this.setFocusTraversable(true);
@@ -62,13 +60,12 @@ public abstract class GameScreen extends Canvas {
             }
         };
         gameTimer.start();
-
-        if (audioManager != null) audioManager.playGameMusic();
+        AudioManager.getInstance().playGameMusic();
     }
 
     public void stopGameLoop() {
         if (gameTimer != null) gameTimer.stop();
-        if (audioManager != null) audioManager.stopGameMusic();
+        AudioManager.getInstance().stopGameMusic();
     }
 
     // Xử lý phím

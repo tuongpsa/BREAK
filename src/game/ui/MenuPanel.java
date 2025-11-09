@@ -13,7 +13,6 @@ import javafx.scene.input.MouseEvent;
  */
 public class MenuPanel extends Canvas {
     private MenuRenderer menuRenderer;
-    private AudioManager audioManager;
     private boolean startGame = false;
     private boolean quitGame = false;
     private boolean showHighScore = false;
@@ -23,11 +22,9 @@ public class MenuPanel extends Canvas {
     // --- BIẾN MỚI CHO HIỆU ỨNG HOVER ---
     private String hoveredButton = ""; // Lưu tên nút đang được hover ("START", "QUIT", "")
 
-    public MenuPanel(double width, double height, AudioManager audioManager) {
+    public MenuPanel(double width, double height) {
         super(width, height);
         menuRenderer = new MenuRenderer();
-        this.audioManager = audioManager;
-
         this.setFocusTraversable(true);
 
         // Xử lý sự kiện click chuột
@@ -44,48 +41,33 @@ public class MenuPanel extends Canvas {
         this.setOnMouseMoved(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                // --- ĐÃ CẬP NHẬT ---
                 handleMouseMove(event.getX(), event.getY());
             }
         });
 
         startMenuLoop();
 
-        if (this.audioManager != null) {
-            this.audioManager.playMenuMusic();
-        }
+        AudioManager.getInstance().playMenuMusic();
     }
 
     private void handleMouseClick(double x, double y) {
-        // Biến kiểm tra xem có click vào nút nào không để phát âm thanh
-        boolean buttonClicked = false;
         boolean hasSave = game.core.SaveManager.hasSessionSave();
 
         // Kiểm tra Continue TRƯỚC Start (vì Continue ở trên Start)
         if (hasSave && isPointInContinueButton(x, y)) {
             continueGame = true;
-            buttonClicked = true;
         }
         else if (isPointInStartButton(x, y)) {
             startGame = true;
-            buttonClicked = true;
         }
         else if (isPointInHighScoreButton(x, y)) {
             showHighScore = true;
-            buttonClicked = true;
         }
         else if (isPointInResumeButton(x, y)) { // (Dùng cho Pause Menu)
             resumeGame = true;
-            buttonClicked = true;
         }
         else if (isPointInQuitButton(x, y)) {
             quitGame = true;
-            buttonClicked = true;
-        }
-
-        // Phát âm thanh click nếu click trúng một nút
-        if (buttonClicked && audioManager != null) {
-            // audioManager.playClickSound();
         }
     }
 
@@ -110,12 +92,6 @@ public class MenuPanel extends Canvas {
 
         hoveredButton = newHover;
 
-        // Chỉ phát âm thanh *một lần* khi trạng thái hover thay đổi
-        if (!oldHover.equals(newHover) && !newHover.isEmpty()) {
-            if (audioManager != null) {
-                //audioManager.playHoverSound();
-            }
-        }
 
     }
 
@@ -216,8 +192,9 @@ public class MenuPanel extends Canvas {
     public void resetContinueGame() { continueGame = false; }
 
     public void stopMenuMusic() {
-        if (audioManager != null) {
-            audioManager.stopMenuMusic();
-        }
+        AudioManager.getInstance().stopMenuMusic();
+    }
+    public void playMenuMusic() {
+        AudioManager.getInstance().playMenuMusic();
     }
 }

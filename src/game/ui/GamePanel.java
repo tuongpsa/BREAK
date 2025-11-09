@@ -47,16 +47,16 @@ public class GamePanel extends GameScreen {
     private int lastLevel = -1;
     private final GameSettings gameSettings;
 
-    public GamePanel(double width, double height, GameSettings settings, AudioManager audioMgr, PauseManager pauseMgr) {
+    public GamePanel(double width, double height, GameSettings settings, PauseManager pauseMgr) {
         // 1. Truyền audioManager và pauseManager lên LỚP CHA (GameScreen)
-        super(width, height, audioMgr, pauseMgr);
+        super(width, height, pauseMgr);
 
         // 2. Lưu lại GameSettings
         this.gameSettings = settings;
         // (this.audioManager và this.pauseManager đã được lớp cha lưu)
 
         // 3. Truyền audioManager (đã được tiêm vào) cho Game
-        game = new Game(this.audioManager);
+        game = new Game();
         highScoreManager = new HighScoreManager();
 
         levelRender = new LevelRender();
@@ -199,7 +199,7 @@ public class GamePanel extends GameScreen {
 
         // Khi game over
         if (game.isGameOver()) {
-            if (audioManager != null) audioManager.playGameOver();
+            AudioManager.getInstance().playGameOver();
 
             if (!highScoreProcessed) {
                 processHighScore();

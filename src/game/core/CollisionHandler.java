@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.concurrent.*;
 
 public class CollisionHandler {
-    private final AudioManager audioManager;
-
     //khai báo LevelManager
     private final LevelManager levelManager;
     
@@ -18,8 +16,7 @@ public class CollisionHandler {
     private final ExecutorService executorService;
 
     //Thêm LevelManager vào constructor
-    public CollisionHandler(AudioManager audioManager, LevelManager levelManager) {
-        this.audioManager = audioManager;
+    public CollisionHandler(LevelManager levelManager) {
         this.levelManager = levelManager; // Lưu lại LevelManager được chia sẻ
         // Tạo thread pool với số lượng thread = số CPU cores
         this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -162,10 +159,8 @@ public class CollisionHandler {
                         // 7. Cập nhật vận tốc mới cho bóng
                         ball.setVelX(vanTocMoiX);
                         ball.setVelY(vanTocMoiY);
-                        
-                        if (audioManager != null) {
-                            audioManager.playPaddleHit();
-                        }
+
+                        AudioManager.getInstance().playPaddleHit();
                     }
                 }
             }
@@ -192,10 +187,8 @@ public class CollisionHandler {
 
                         if (hitX && hitY) {
                             brick.hit();
-                            
-                            if (audioManager != null) {
-                                audioManager.playBrickHit();
-                            }
+                            AudioManager.getInstance().playBrickHit();
+
 
                             float overlapLeft   = Math.abs((nextX + radius * 2) - rect.x);
                             float overlapRight  = Math.abs((rect.x + rect.width) - nextX);

@@ -13,28 +13,22 @@ import java.io.IOException;
  * Sử dụng JavaFX Media cho MP3 và Java Sound API cho WAV
  */
 public class AudioManager {
+    private static AudioManager instance;
+
     // JavaFX Media cho MP3
     private MediaPlayer menuMusic;
     private MediaPlayer gameMusic;
-    
-    // Java Sound API cho WAV
-    private Clip brickHitClip;
-    private Clip paddleHitClip;
-    private Clip gameOverClip;
-    
-    private boolean soundEnabled = true;
-    private boolean musicEnabled = true;
-    private boolean initialized = false;
 
-    private GameSettings gameSettings;
-    public AudioManager(){};
-
-    public AudioManager(GameSettings settings) {
-        this.gameSettings = settings;
-
+    /**
+     *
+     * @param settings
+     */
+    private AudioManager(GameSettings settings) {
         if (initialized) {
             return; // Tránh khởi tạo nhiều lần
         }
+
+        this.gameSettings = settings;
 
         try {
             // Load MP3 music với JavaFX Media
@@ -51,6 +45,42 @@ public class AudioManager {
             createDefaultSounds();
         }
     }
+    /**
+     * 3. Phương thức public static để "khởi tạo" (initialize) Singleton.
+     * Phải được gọi một lần duy nhất khi game bắt đầu.
+     * @param settings Đối tượng GameSettings cần thiết.
+     */
+    public static void initialize(GameSettings settings) {
+        if (instance == null) {
+            instance = new AudioManager(settings);
+        } else {
+            System.out.println("AudioManager đã được khởi tạo rồi.");
+        }
+    }
+
+    /**
+     * 4. Phương thức public static để get thể hiện duy nhất.
+     * Mọi lớp khác trong game sẽ dùng hàm này.
+     * @return Thể hiện (instance) duy nhất của AudioManager.
+     */
+    public static AudioManager getInstance() {
+        if (instance == null) {
+            // Lỗi này xảy ra nếu ai đó gọi getInstance() trước khi gọi initialize()
+            throw new IllegalStateException("AudioManager chưa được khởi tạo! " +
+                    "Hãy gọi AudioManager.initialize(settings) trước.");
+        }
+        return instance;
+    }
+    // Java Sound API cho WAV
+    private Clip brickHitClip;
+    private Clip paddleHitClip;
+    private Clip gameOverClip;
+
+    private boolean soundEnabled = true;
+    private boolean musicEnabled = true;
+    private boolean initialized = false;
+
+    private GameSettings gameSettings;
     
     private void loadMP3Music() {
         try {

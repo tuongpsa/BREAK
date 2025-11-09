@@ -46,9 +46,9 @@ public class PauseMenu {
     private final PauseManager pauseManager;
 
     /**
-     * Tạo giao diện menu pause ĐẸP
+     * Tạo giao diện menu pause
      */
-    public PauseMenu(PauseManager pauseManager, GameSettings gameSettings, AudioManager audioManager, Runnable onRestart, Runnable onExit) {
+    public PauseMenu(PauseManager pauseManager, GameSettings gameSettings, Runnable onRestart, Runnable onExit) {
         this.pauseManager = pauseManager;
 
         // === 1. LOAD HÌNH ẢNH ===
@@ -68,7 +68,7 @@ public class PauseMenu {
         mainPausePane = buildMainPausePane(onRestart, onExit);
 
         // === 4. XÂY DỰNG PANE 2: MENU CÀI ĐẶT ===
-        settingsPane = buildSettingsPane(gameSettings, audioManager);
+        settingsPane = buildSettingsPane(gameSettings);
 
         // Thêm cả 2 pane vào root (pane chính ở trên)
         rootPane.getChildren().addAll(settingsPane, mainPausePane);
@@ -133,7 +133,7 @@ public class PauseMenu {
     /**
      * Xây dựng giao diện cho Menu Cài đặt
      */
-    private StackPane buildSettingsPane(GameSettings gameSettings, AudioManager audioManager) {
+    private StackPane buildSettingsPane(GameSettings gameSettings) {
         // === 1. Khung nền ===
         ImageView frameView = new ImageView(frameImage);
         frameView.setFitHeight(650);
@@ -156,14 +156,13 @@ public class PauseMenu {
         // === 4. Nhãn và thanh điều khiển ===
         Label musicLabel = createLabel("MUSIC VOLUME:", 16, "#FFFFFF");
         Slider musicSlider = createStyledSlider(gameSettings.getMusicVolume());
-        musicSlider.valueProperty().addListener((obs, o, n) -> audioManager.setMusicVolume(n.doubleValue()));
+        musicSlider.valueProperty().addListener((obs, o, n) -> AudioManager.getInstance().setMusicVolume(n.doubleValue()));
         musicSlider.setPrefWidth(controlWidth);
         musicSlider.setMaxWidth(controlWidth);
 
         Label sfxLabel = createLabel("SFX VOLUME:", 16, "#FFFFFF");
         Slider sfxSlider = createStyledSlider(gameSettings.getSfxVolume());
-        sfxSlider.valueProperty().addListener((obs, o, n) -> audioManager.setSoundEffectsVolume(n.doubleValue()));
-        sfxSlider.setPrefWidth(controlWidth);
+        sfxSlider.valueProperty().addListener((obs, o, n) -> AudioManager.getInstance().setSoundEffectsVolume(n.doubleValue()));
         sfxSlider.setMaxWidth(controlWidth);
 
         Label controlLabel = createLabel("CONTROL:", 16, "#FFFFFF");

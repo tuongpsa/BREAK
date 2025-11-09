@@ -19,7 +19,6 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     private GameSettings gameSettings;
-    private AudioManager audioManager;
     private PauseManager pauseManager;
     private PauseMenu pauseMenu;
 
@@ -31,21 +30,18 @@ public class Main extends Application {
     private Scene menuScene;
     private Scene highScoreScene;
     private AnimationTimer gameOverTimer;
-    private AnimationTimer menuTimer;
-    private AnimationTimer highScoreTimer;
 
 
     @Override // ghi đè lên phg thức start của lớp Application
     public void start(Stage stage) {
         this.primaryStage = stage;
 
-        gameSettings = new GameSettings();
-        // Truyền settings vào AudioManager
-        audioManager = new AudioManager(gameSettings);
-        pauseManager = new PauseManager();
+        this.gameSettings = new GameSettings();
+        AudioManager.initialize(this.gameSettings);
+        this.pauseManager = new PauseManager();
         
         // Tạo menu panel
-        menuPanel = new MenuPanel(480, 820, audioManager);
+        menuPanel = new MenuPanel(480, 820);
         StackPane menuRoot = new StackPane(menuPanel);
         menuScene = new Scene(menuRoot, 480, 820);
         
@@ -57,15 +53,14 @@ public class Main extends Application {
         // Tạo game panel
         // 1. Tạo GamePanel và TRUYỀN các hệ thống vào
         // (Bạn cần sửa constructor của GamePanel.java để nhận chúng)
-        gamePanel = new GamePanel(480, 820, gameSettings, audioManager, pauseManager);
+        gamePanel = new GamePanel(480, 820, gameSettings, pauseManager);
 
         // 2. Tạo PauseMenu (UI)
         pauseMenu = new PauseMenu(
                 pauseManager,
                 gameSettings,
-                audioManager,
-                () -> gamePanel.getGame().resetGame(), // Hàm Restart
-                this::switchToMenuFromPause                      // Hàm Exit (quay về Menu từ Pause)
+                () -> gamePanel.getGame().resetGame(),
+                this::switchToMenuFromPause            // Dòng này đã đúng
         );
 
         // 3. Dùng StackPane để xếp chồng PauseMenu LÊN TRÊN GamePanel
@@ -74,17 +69,6 @@ public class Main extends Application {
 
         stage.setTitle("Brick Breaker Demo");
         stage.setScene(menuScene);
-        
-        // Khởi tạo session save từ file nếu có (để hiển thị Continue khi khởi động lại)
-        game.core.SaveManager.initializeSessionSave();
-        
-        // Lưu game khi đóng cửa sổ (nếu đang chơi)
-        stage.setOnCloseRequest(e -> {
-            if (gamePanel != null && !gamePanel.getGame().isGameOver()) {
-                game.core.SaveManager.save(gamePanel.getGame());
-            }
-        });
-        
         stage.show();
 
         // 4. Thiết lập Input và Listener (Rất quan trọng)
@@ -137,11 +121,7 @@ public class Main extends Application {
         });
     }
     private void startMenuLoop() {
-        // Stop previous menu timer if any to avoid overlapping timers
-        if (menuTimer != null) {
-            menuTimer.stop();
-        }
-        menuTimer = new AnimationTimer() {
+        AnimationTimer menuTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (menuPanel.isStartGame()) {
@@ -171,10 +151,10 @@ public class Main extends Application {
             menuPanel.stopMenuMusic();
         }
         // GamePanel đã được khởi tạo 1 lần (và duy nhất) trong hàm start().
-        // Chúng ta chỉ cần reset game.
+        // chỉ cần reset game.
         gamePanel.getGame().resetGame();
-        // Bắt đầu game mới: xóa save cũ
-        game.core.SaveManager.deleteSave();
+        // Bắt đầu game mới: ẩn continue trong phiên
+        game.core.SaveManager.clearSessionSave();
 
         primaryStage.setScene(gameScene);
         gamePanel.setMenuCallback(this::switchToMenu);
@@ -188,47 +168,24 @@ public class Main extends Application {
     }
 
     private void switchToGameContinue() {
-        try {
-            // Dừng nhạc menu
-            if (menuPanel != null) {
-                menuPanel.stopMenuMusic();
-                menuPanel.resetContinueGame();
-            }
-
-            // Load save TRƯỚC khi set scene và start game loop
-            boolean loadSuccess = game.core.SaveManager.load(gamePanel.getGame());
-            if (!loadSuccess) {
-                // Nếu load thất bại, reset game về trạng thái ban đầu
-                gamePanel.getGame().resetGame();
-            }
-
-            // Set scene và start game loop SAU KHI đã load
-            if (gameScene != null && primaryStage != null) {
-                primaryStage.setScene(gameScene);
-                gamePanel.setMenuCallback(this::switchToMenu);
-                gamePanel.startGameLoop();
-                gamePanel.requestFocus();
-
-                // Đã dùng continue: ẩn lại cho đến khi save mới
-                game.core.SaveManager.clearSessionSave();
-
-                setupGameInput(gameScene);
-                startGameOverLoop();
-            }
-        } catch (Exception e) {
-            System.err.println("Error in switchToGameContinue: " + e.getMessage());
-            e.printStackTrace();
-            // Fallback: reset và chuyển sang game mới
-            if (gamePanel != null) {
-                gamePanel.getGame().resetGame();
-            }
-            if (gameScene != null && primaryStage != null) {
-                primaryStage.setScene(gameScene);
-                if (gamePanel != null) {
-                    gamePanel.startGameLoop();
-                }
-            }
+        // Dừng nhạc menu
+        if (menuPanel != null) {
+            menuPanel.stopMenuMusic();
+            menuPanel.resetContinueGame();
         }
+
+        primaryStage.setScene(gameScene);
+        gamePanel.setMenuCallback(this::switchToMenu);
+        gamePanel.startGameLoop();
+        gamePanel.requestFocus();
+
+        // Load save
+        game.core.SaveManager.load(gamePanel.getGame());
+        // Đã dùng continue: ẩn lại cho đến khi save mới
+        game.core.SaveManager.clearSessionSave();
+
+        setupGameInput(gameScene);
+        startGameOverLoop();
     }
     
     private void startGameOverLoop() {
@@ -251,17 +208,9 @@ public class Main extends Application {
             gamePanel.stopGameLoop();
         }
 
-        // Stop any running timers from other screens
-        if (gameOverTimer != null) {
-            gameOverTimer.stop();
-        }
-        if (highScoreTimer != null) {
-            highScoreTimer.stop();
-        }
-
-        // Nếu quay về từ game over, xóa save và không cho Continue
+        // Nếu quay về từ game over, không cho Continue
         if (gamePanel != null && gamePanel.getGame().isGameOver()) {
-            game.core.SaveManager.deleteSave();
+            game.core.SaveManager.clearSessionSave();
         }
         primaryStage.setScene(menuScene);
         menuPanel.resetStartGame();
@@ -271,10 +220,7 @@ public class Main extends Application {
         menuPanel.requestFocus();
         
         // Bắt đầu lại nhạc menu
-        if (audioManager != null) {
-            audioManager.playMenuMusic();
-        }
-
+        menuPanel.playMenuMusic();
         startMenuLoop();
     }
 
@@ -282,13 +228,6 @@ public class Main extends Application {
         // Dừng game loop cũ nếu có
         if (gamePanel != null) {
             gamePanel.stopGameLoop();
-        }
-        // Stop any running timers to avoid overlap when returning from pause
-        if (gameOverTimer != null) {
-            gameOverTimer.stop();
-        }
-        if (highScoreTimer != null) {
-            highScoreTimer.stop();
         }
         // Lưu khi thoát ra menu từ Pause → cho phép Continue trong phiên
         if (gamePanel != null) {
@@ -301,10 +240,8 @@ public class Main extends Application {
         menuPanel.resetShowHighScore();
         menuPanel.requestFocus();
 
-        if (audioManager != null) {
-            audioManager.playMenuMusic();
-        }
-
+        // Bắt đầu lại nhạc menu
+        menuPanel.playMenuMusic();
         startMenuLoop();
     }
     
@@ -318,11 +255,7 @@ public class Main extends Application {
     }
     
     private void startHighScoreLoop() {
-        // Stop previous high score timer if any
-        if (highScoreTimer != null) {
-            highScoreTimer.stop();
-        }
-        highScoreTimer = new AnimationTimer() {
+        AnimationTimer highScoreTimer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 if (highScorePanel.isBackToMenu()) {
