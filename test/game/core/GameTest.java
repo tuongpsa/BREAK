@@ -15,7 +15,7 @@ class GameTest {
     @BeforeEach
     void setUp() {
         // Tạo một Game mới. (null là vì chúng ta không test âm thanh)
-        game = new Game(null);
+        game = new Game();
     }
 
     /**
