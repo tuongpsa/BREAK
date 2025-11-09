@@ -14,7 +14,7 @@ class GameTest {
     // để đảm bảo chúng ta luôn có 1 đối tượng Game mới tinh.
     @BeforeEach
     void setUp() {
-        // Tạo một Game mới. (null là vì chúng ta không test âm thanh)
+        // Tạo một Game mới
         game = new Game();
     }
 
