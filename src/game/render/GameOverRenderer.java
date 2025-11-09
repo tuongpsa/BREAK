@@ -69,30 +69,30 @@ public class GameOverRenderer {
         gc.fillText(scoreText + score, width / 2 - 85, height / 2 - 10);
 
         // Vẽ message
-        String message = "You Are Chicken!!!";
-        Font messageFont = Font.loadFont("file:assets/Spooky.ttf", 33);
-        gc.setFont(messageFont);
+      //  String message = "You Are Chicken!!!";
+    //    Font messageFont = Font.loadFont("file:assets/Spooky.ttf", 33);
+     //   gc.setFont(messageFont);
             // vẽ viền
-        gc.setStroke(Color.WHITE);
-        gc.setLineWidth(4); //độ dày viền 2px
-        gc.strokeText(message, width / 2 - 125, height / 2 - 180); // vẽ viền xung quanh
+     //   gc.setStroke(Color.WHITE);
+    //    gc.setLineWidth(4); //độ dày viền 2px
+     //   gc.strokeText(message, width / 2 - 125, height / 2 - 180); // vẽ viền xung quanh
 
-        gc.setFill(Color.CRIMSON);
-        gc.fillText(message, width / 2 - 125, height / 2 - 180);
+     //   gc.fillText(message, width / 2 - 125, height / 2 - 180);
 
         // Vẽ instruction
         String gameOverInstruction = "Press R to RESTART or ESC to QUIT";
         Font gameOverInstructionFont = Font.loadFont("file:assets/Spooky.ttf", 22);
             // Vẽ bóng
+        int x = 35;
         gc.setFont(gameOverInstructionFont);
         gc.setFill(Color.PURPLE);
-        gc.fillText(gameOverInstruction,  width / 2 - 127, height / 2 + 42);
+        gc.fillText(gameOverInstruction,  width / 2 - 127-x, height / 2 + 42);
             // Viền
         gc.setStroke(Color.BLUE);
         gc.setLineWidth(2); //độ dày viền 2px
-        gc.strokeText(gameOverInstruction, width / 2 - 130, height / 2 + 40); // vẽ viền xung quanh
+        gc.strokeText(gameOverInstruction, width / 2 - 130-x, height / 2 + 40); // vẽ viền xung quanh
 
         gc.setFill(Color.WHITE);// nền chữ màu trắng
-        gc.fillText(gameOverInstruction, width / 2 - 130, height / 2 + 40);
+        gc.fillText(gameOverInstruction, width / 2 - 130-x, height / 2 + 40);
     }
 }
