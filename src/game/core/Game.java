@@ -20,7 +20,7 @@ public class Game {
 
     private List<Ball> balls = new ArrayList<>();
     private final float ballRadius = 15;
-    private  float ballSpeed = 500.f;
+    private  float ballSpeed = 750.f;
 
     private Paddle paddle;
     private final float paddleWidth = width/2 ;
@@ -240,8 +240,8 @@ public class Game {
         // Reset level về 1
         levelManager.setLevel(1);
         
-        // Reset ball speed về tốc độ ban đầu
-        ballSpeed = 1000.f;
+        // Reset ball speed về tốc độ ban đầu (250.f)
+        ballSpeed = 750.f;
         
         // Reset tất cả power-up states
         speedBoostActive = false;

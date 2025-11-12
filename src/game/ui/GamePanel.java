@@ -277,6 +277,9 @@ public class GamePanel extends GameScreen {
         // Chỉ restart khi game over
         if (game.isGameOver()) {
             System.out.println("Restarting game...");
+            // Reset input flags để tránh paddle bị dính
+            leftPressed = false;
+            rightPressed = false;
             game.resetGame();
             highScoreProcessed = false;
         }
